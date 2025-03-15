@@ -1,50 +1,62 @@
-import cn from 'clsx';
+'use client';
 
-export interface SelectProps {
-  className: string;
+import { SelectHTMLAttributes } from 'react';
+import clsx from 'clsx';
+
+export interface SelectOption<T extends string | number | readonly string[]> {
+  value: T;
   label: string;
-  name: string;
-  id: string;
-  value: string;
-  required?: boolean;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: Array<{ value: string; label: string }>;
 }
 
-const Select = ({
-  className,
+interface SelectInputProps<T extends string | number | readonly string[]>
+  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
+  label?: string;
+  options: SelectOption<T>[];
+  error?: string;
+  onChange?: (value: T) => void;
+}
+
+function SelectInput<T extends string | number | readonly string[]>({
   label,
-  name,
-  id,
-  value,
-  required,
-  onChange,
   options,
-}: SelectProps) => {
+  error,
+  value,
+  onChange,
+  className,
+  ...props
+}: SelectInputProps<T>) {
   return (
-    <div className={`form-control ${cn(className)}`}>
-      <label className='label'>
-        <span className='label-text'>{label}</span>
-      </label>
+    <div className='form-control w-full'>
+      {label && (
+        <label className='label'>
+          <span className='label-text font-medium'>{label}</span>
+        </label>
+      )}
       <select
-        name={name}
-        id={id}
-        className='select select-bordered w-full'
-        required={required}
-        value={value}
-        onChange={onChange}
+        className={clsx(
+          'select select-bordered w-full',
+          {
+            'select-error': error,
+          },
+          className
+        )}
+        value={value as string}
+        onChange={(e) => onChange?.(e.target.value as T)}
+        {...props}
       >
-        <option value='' disabled>
-          Select a {label.toLowerCase()}
-        </option>
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option key={String(option.value)} value={String(option.value)}>
             {option.label}
           </option>
         ))}
       </select>
+      {error && (
+        <label className='label'>
+          <span className='label-text-alt text-error'>{error}</span>
+        </label>
+      )}
     </div>
   );
-};
+}
 
-export default Select;
+export default SelectInput;

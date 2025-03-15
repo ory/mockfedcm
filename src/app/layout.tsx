@@ -60,8 +60,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
             rightContent={rightSideContent}
             className='sticky top-0 z-30'
           />
-
-          <main className='flex-grow'>{children}</main>
+          <main className='flex-grow pt-8 px-4 sm:px-6 lg:px-8'>
+            {children}
+          </main>
         </div>
       </body>
     </html>

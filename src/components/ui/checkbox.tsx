@@ -1,37 +1,48 @@
-import cn from 'clsx';
+'use client';
 
-export interface CheckboxProps {
-  className: string;
-  label: string;
-  name: string;
-  id: string;
-  checked?: boolean;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+import { InputHTMLAttributes } from 'react';
+import clsx from 'clsx';
+
+interface CheckboxInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  label?: string;
+  error?: string;
+  onChange?: (checked: boolean) => void;
 }
 
-const CheckBox = ({
-  className,
+const CheckboxInput = ({
   label,
-  name,
-  id,
+  error,
   checked,
   onChange,
-}: CheckboxProps) => {
+  className,
+  ...props
+}: CheckboxInputProps) => {
   return (
-    <div className={cn('form-control', className)}>
-      <label className='label'>
-        <span className='label-text'>{label}</span>
+    <div className='form-control'>
+      <label className='label cursor-pointer justify-start gap-2'>
+        <input
+          type='checkbox'
+          className={clsx(
+            'checkbox',
+            {
+              'checkbox-error': error,
+            },
+            className
+          )}
+          checked={checked}
+          onChange={(e) => onChange?.(e.target.checked)}
+          {...props}
+        />
+        {label && <span className='label-text font-medium'>{label}</span>}
       </label>
-      <input
-        type='checkbox'
-        name={name}
-        id={id}
-        className='input input-bordered w-full'
-        checked={checked}
-        onChange={onChange}
-      />
+      {error && (
+        <label className='label'>
+          <span className='label-text-alt text-error'>{error}</span>
+        </label>
+      )}
     </div>
   );
 };
 
-export default CheckBox;
+export default CheckboxInput;
