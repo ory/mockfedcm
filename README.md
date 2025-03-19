@@ -4,7 +4,7 @@ A mock implementation of the [FedCM (Federated Credential Management) API](https
 
 ## Features
 
-- 🔐 Complete FedCM IdP implementation
+- 🔐 Complete FedCM IdP implementation\*
 - 🔑 FedCM Relying Party (RP) testing tools
 - ⚡ Built with Next.js 15 and TypeScript
 - 🎨 Modern UI with Tailwind CSS and DaisyUI
@@ -21,7 +21,7 @@ A mock implementation of the [FedCM (Federated Credential Management) API](https
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/mockfedcm.git
+git clone https://github.com/jhickmanit/mockfedcm.git
 cd mockfedcm
 ```
 
