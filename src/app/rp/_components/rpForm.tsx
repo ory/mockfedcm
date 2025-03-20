@@ -136,98 +136,96 @@ const FedCMRPForm = () => {
   };
 
   return (
-    <div>
-      <h2 className='text-2xl font-bold mb-6'>FedCM Configuration</h2>
+    <div className='card w-full bg-base-100'>
+      <div className='card-body'>
+        <h2 className='card-title mb-6'>FedCM Configuration</h2>
 
-      <form onSubmit={handleSubmit} className='space-y-6'>
-        <TextInput
-          label='Config URL'
-          type='url'
-          placeholder='https://example.com/fedcm.json'
-          value={config.configURL}
-          onChange={(value) => setConfig({ ...config, configURL: value })}
-          required
-        />
-
-        <TextInput
-          label='Client ID'
-          placeholder='your-client-id'
-          value={config.clientId}
-          onChange={(value) => setConfig({ ...config, clientId: value })}
-          required
-        />
-
-        <div className='space-y-2'>
-          <TextInput label='Nonce' value={config.nonce} readOnly />
-          <div className='flex justify-end'>
-            <Button type='button' onClick={handleGenerateNewNonce}>
-              Regenerate Nonce
-            </Button>
-          </div>
-        </div>
-
-        <ContextSelect
-          value={config.context}
-          onChange={(value) => setConfig({ ...config, context: value })}
-        />
-
-        <CheckboxInput
-          label='Use Login Hint'
-          checked={config.useLoginHint}
-          onChange={(checked) =>
-            setConfig({ ...config, useLoginHint: checked })
-          }
-        />
-
-        {config.useLoginHint && (
+        <form onSubmit={handleSubmit} className='space-y-6'>
           <TextInput
-            placeholder='user@example.com'
-            value={config.loginHint || ''}
-            onChange={(value) => setConfig({ ...config, loginHint: value })}
+            label='Config URL'
+            type='url'
+            placeholder='https://example.com/fedcm.json'
+            value={config.configURL}
+            onChange={(value) => setConfig({ ...config, configURL: value })}
+            required
           />
-        )}
 
-        <CheckboxInput
-          label='Auto Test (automatically run test after 5 seconds)'
-          checked={autoTest}
-          onChange={(checked) => setAutoTest(checked)}
-        />
+          <TextInput
+            label='Client ID'
+            placeholder='your-client-id'
+            value={config.clientId}
+            onChange={(value) => setConfig({ ...config, clientId: value })}
+            required
+          />
 
-        <div className='pt-4'>
-          <Button type='submit' variant='primary'>
-            Generate Configuration
-          </Button>
-        </div>
-      </form>
-
-      {jsonOutput && (
-        <div className='mt-8'>
-          <h3 className='text-xl font-semibold mb-2'>Configuration Output</h3>
-          <div className='bg-base-300 p-4 rounded-lg'>
-            <pre className='whitespace-pre-wrap'>{jsonOutput}</pre>
-          </div>
-          <div className='mt-4 flex justify-between items-center'>
-            <p className='text-sm'>
-              Use this configuration with the FedCM API to authenticate users
-              through your identity provider.
-            </p>
-            <div className='flex gap-2 flex-shrink-0'>
-              {countdown !== null && (
-                <Button variant='ghost' onClick={handleCancelTest}>
-                  Cancel ({countdown}s)
-                </Button>
-              )}
-              <Button
-                variant='accent'
-                onClick={handleTest}
-                disabled={countdown !== null}
-              >
-                {countdown !== null ? `Test in ${countdown}s...` : 'Test!'}
+          <div className='space-y-2'>
+            <TextInput label='Nonce' value={config.nonce} readOnly />
+            <div className='flex justify-end'>
+              <Button type='button' onClick={handleGenerateNewNonce}>
+                Regenerate Nonce
               </Button>
             </div>
           </div>
-        </div>
-      )}
+
+          <ContextSelect
+            value={config.context}
+            onChange={(value) => setConfig({ ...config, context: value })}
+          />
+
+          <CheckboxInput
+            label='Use Login Hint'
+            checked={config.useLoginHint}
+            onChange={(checked) =>
+              setConfig({ ...config, useLoginHint: checked })
+            }
+          />
+
+          {config.useLoginHint && (
+            <TextInput
+              placeholder='user@example.com'
+              value={config.loginHint || ''}
+              onChange={(value) => setConfig({ ...config, loginHint: value })}
+            />
+          )}
+
+          <CheckboxInput
+            label='Auto Test (automatically run test after 5 seconds)'
+            checked={autoTest}
+            onChange={(checked) => setAutoTest(checked)}
+          />
+
+          <div className='card-actions justify-end pt-4'>
+            <Button type='submit' variant='primary'>
+              Generate Configuration
+            </Button>
+          </div>
+        </form>
+
+        {jsonOutput && (
+          <div className='mt-6'>
+            <h3 className='card-title text-lg mb-2'>Generated Configuration</h3>
+            <pre className='bg-base-200 p-4 rounded-lg overflow-x-auto'>
+              <code>{jsonOutput}</code>
+            </pre>
+            <div className='card-actions justify-end mt-4'>
+              {countdown !== null ? (
+                <>
+                  <span className='text-sm self-center mr-2'>
+                    Testing in {countdown}s...
+                  </span>
+                  <Button onClick={handleCancelTest} variant='ghost'>
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={handleTest} variant='secondary'>
+                  Test Configuration
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

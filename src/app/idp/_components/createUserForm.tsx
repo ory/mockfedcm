@@ -136,76 +136,82 @@ const CreateUserForm = () => {
   };
 
   return (
-    <div>
-      <h2 className='text-2xl font-bold mb-6'>Create New User</h2>
-      <form onSubmit={handleSubmit} className='space-y-6'>
-        {errors.general && (
-          <div className='alert alert-error'>
-            <span>{errors.general}</span>
+    <div className='card w-full bg-base-100'>
+      <div className='card-body'>
+        <h2 className='card-title mb-6'>Create New User</h2>
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          {errors.general && (
+            <div className='alert alert-error'>
+              <span>{errors.general}</span>
+            </div>
+          )}
+          <TextInput
+            label='First Name'
+            name='firstName'
+            value={formData.firstName}
+            onChange={(value) => setFormData({ ...formData, firstName: value })}
+            error={errors.firstName}
+            placeholder='John'
+            required
+          />
+          <TextInput
+            label='Last Name'
+            name='lastName'
+            value={formData.lastName}
+            onChange={(value) => setFormData({ ...formData, lastName: value })}
+            error={errors.lastName}
+            placeholder='Doe'
+            required
+          />
+          <TextInput
+            label='Email'
+            name='email'
+            value={formData.email}
+            onChange={(value) => setFormData({ ...formData, email: value })}
+            error={errors.email}
+            required
+            type='email'
+            placeholder='john.doe@example.com'
+          />
+          <TextInput
+            label='Password'
+            name='password'
+            value={formData.password}
+            onChange={(value) => setFormData({ ...formData, password: value })}
+            error={errors.password}
+            type='password'
+            placeholder='********'
+            required
+          />
+          <TextInput
+            label='Confirm Password'
+            name='passwordConfirm'
+            value={formData.passwordConfirm}
+            onChange={(value) =>
+              setFormData({ ...formData, passwordConfirm: value })
+            }
+            error={errors.passwordConfirm}
+            type='password'
+            placeholder='********'
+            required
+          />
+          <TextInput
+            label='Picture URL'
+            name='pictureUrl'
+            value={formData.pictureUrl}
+            onChange={(value) =>
+              setFormData({ ...formData, pictureUrl: value })
+            }
+            placeholder='https://example.com/picture.jpg'
+            error={errors.pictureUrl}
+          />
+          <div className='card-actions justify-end pt-4'>
+            <Button type='submit' disabled={isLoading} variant='primary'>
+              {isLoading ? 'Creating...' : 'Create User'}
+            </Button>
           </div>
-        )}
-        <TextInput
-          label='First Name'
-          name='firstName'
-          value={formData.firstName}
-          onChange={(value) => setFormData({ ...formData, firstName: value })}
-          error={errors.firstName}
-          placeholder='John'
-          required
-        />
-        <TextInput
-          label='Last Name'
-          name='lastName'
-          value={formData.lastName}
-          onChange={(value) => setFormData({ ...formData, lastName: value })}
-          error={errors.lastName}
-          placeholder='Doe'
-          required
-        />
-        <TextInput
-          label='Email'
-          name='email'
-          value={formData.email}
-          onChange={(value) => setFormData({ ...formData, email: value })}
-          error={errors.email}
-          required
-          type='email'
-          placeholder='john.doe@example.com'
-        />
-        <TextInput
-          label='Password'
-          name='password'
-          value={formData.password}
-          onChange={(value) => setFormData({ ...formData, password: value })}
-          error={errors.password}
-          type='password'
-          placeholder='********'
-          required
-        />
-        <TextInput
-          label='Confirm Password'
-          name='passwordConfirm'
-          value={formData.passwordConfirm}
-          onChange={(value) =>
-            setFormData({ ...formData, passwordConfirm: value })
-          }
-          error={errors.passwordConfirm}
-          type='password'
-          placeholder='********'
-          required
-        />
-        <TextInput
-          label='Picture URL'
-          name='pictureUrl'
-          value={formData.pictureUrl}
-          onChange={(value) => setFormData({ ...formData, pictureUrl: value })}
-          placeholder='https://example.com/picture.jpg'
-          error={errors.pictureUrl}
-        />
-        <Button type='submit' disabled={isLoading}>
-          {isLoading ? 'Creating...' : 'Create User'}
-        </Button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

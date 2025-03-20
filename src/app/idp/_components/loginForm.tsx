@@ -102,7 +102,7 @@ export default function LoginForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='space-y-6'>
           <TextInput
             type='email'
             label='Email'
@@ -121,9 +121,11 @@ export default function LoginForm() {
             onChange={(value) => setFormData({ ...formData, password: value })}
             required
           />
-          <Button type='submit' disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Button>
+          <div className='pt-4'>
+            <Button type='submit' disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </div>
         </form>
       </div>
     </div>
