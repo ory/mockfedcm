@@ -53,15 +53,6 @@ export interface FedCMAccountsResponse {
   accounts: FedCMAccount[];
 }
 
-export interface FedCMAccount {
-  id: string;
-  name: string;
-  email: string;
-  given_name?: string;
-  picture?: string;
-  approved_clients?: unknown[];
-}
-
 export interface FedCMClientMetadataRequest {
   client_id: string;
   nonce: string;

@@ -1,6 +1,6 @@
 import Button from '@/components/ui/button';
 import TextInput from '@/components/ui/textInput';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface LoginFormData {
   email: string;
@@ -8,47 +8,16 @@ interface LoginFormData {
 }
 
 export default function LoginForm() {
-  const [flowId, setFlowId] = useState<string | null>(null);
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Get flow ID when component mounts
-  useEffect(() => {
-    const fetchFlowId = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/auth/login', {
-          method: 'GET',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to initialize login flow');
-        }
-
-        const data = await response.json();
-        setFlowId(data.flowId);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFlowId();
-  }, []);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!flowId) {
-      setError('Login flow not initialized. Please refresh the page.');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
@@ -59,8 +28,7 @@ export default function LoginForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          flowId,
-          email: formData.email,
+          username: formData.email,
           password: formData.password,
         }),
       });
@@ -71,6 +39,8 @@ export default function LoginForm() {
         throw new Error(data.error || 'Login failed');
       }
 
+      setSuccess(true);
+
       // TODO: figure out where to redirect after login...
       window.location.href = '/';
     } catch (err) {
@@ -80,17 +50,6 @@ export default function LoginForm() {
     }
   };
 
-  if (loading && !flowId) {
-    return (
-      <div className='card w-96 bg-base-100 shadow-xl'>
-        <div className='card-body flex items-center justify-center'>
-          <div className='loading loading-spinner loading-lg'></div>
-          <p className='mt-2'>Initializing login...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className='card w-96 bg-base-100 shadow-xl'>
       <div className='card-body'>
@@ -99,6 +58,12 @@ export default function LoginForm() {
         {error && (
           <div className='alert alert-error'>
             <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className='alert alert-success'>
+            <span>Successfully signed in! Redirecting...</span>
           </div>
         )}
 

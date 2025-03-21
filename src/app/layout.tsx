@@ -9,7 +9,7 @@ import Header from '@/components/ui/header';
 const inter = Inter({ subsets: ['latin'] });
 
 // Define metadata for the page
-export const metadat: Metadata = {
+export const metadata: Metadata = {
   title: 'FedCM Mock Site',
   description: 'A free FedCM RP & IdP for testing FedCM integrations.',
   authors: { name: 'Ory', url: 'https://ory.sh' },

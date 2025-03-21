@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   getManifestResponse,
-  getAccounts,
+  getMockAccounts,
   getClientMetadata,
   generateToken,
+  getUserFromCookie,
 } from '@/lib/fedcm';
 import { FedCMTokenRequest } from '@/types/fedcm';
 
@@ -14,6 +15,14 @@ const FEDCM_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Sec-Fetch-Dest',
   'Content-Type': 'application/json',
 };
+
+// Define valid FedCM routes
+type FedCMRoute =
+  | 'manifest'
+  | 'accounts'
+  | 'client-metadata'
+  | 'disconnect'
+  | 'token';
 
 // Validate if the request is coming from the FedCM API
 function validateFedCMRequest(
@@ -33,15 +42,34 @@ function validateFedCMRequest(
   return secFetchDest === expectedDest;
 }
 
+// Validate if the route is a valid FedCM route
+function isValidFedCMRoute(route: string): route is FedCMRoute {
+  const validRoutes: FedCMRoute[] = [
+    'manifest',
+    'accounts',
+    'client-metadata',
+    'disconnect',
+    'token',
+  ];
+  return validRoutes.includes(route as FedCMRoute);
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { route: string[] } }
+  { params }: { params: { route: string } }
 ) {
-  const route = params.route?.[0] || '';
+  const route = params.route;
 
   // Enable CORS
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, { headers: FEDCM_HEADERS, status: 204 });
+  }
+
+  if (!isValidFedCMRoute(route)) {
+    return NextResponse.json(
+      { error: 'Invalid route' },
+      { status: 400, headers: FEDCM_HEADERS }
+    );
   }
 
   // Handle different FedCM API endpoints
@@ -64,7 +92,7 @@ export async function GET(
         );
       }
 
-      const accounts = await getAccounts();
+      const accounts = await getMockAccounts();
       return NextResponse.json(accounts, {
         headers: FEDCM_HEADERS,
       });
@@ -83,7 +111,7 @@ export async function GET(
 
       // Extract client_id from URL query params
       const url = new URL(request.url);
-      const clientId = url.searchParams.get('client_id');
+      const clientId = url.searchParams.get('client_id') || 'mockfedcm';
 
       if (!clientId) {
         return NextResponse.json(
@@ -122,19 +150,29 @@ export async function GET(
       );
 
     default:
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Route not supported' },
+        { status: 405, headers: FEDCM_HEADERS }
+      );
   }
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { route: string[] } }
+  { params }: { params: { route: string } }
 ) {
-  const route = params.route?.[0] || '';
+  const route = params.route;
 
   // Enable CORS
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, { headers: FEDCM_HEADERS, status: 204 });
+  }
+
+  if (!isValidFedCMRoute(route)) {
+    return NextResponse.json(
+      { error: 'Invalid route' },
+      { status: 400, headers: FEDCM_HEADERS }
+    );
   }
 
   // Handle token endpoint (the only POST endpoint)
@@ -151,7 +189,32 @@ export async function POST(
     }
 
     try {
+      const username = await getUserFromCookie();
+      if (!username) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401, headers: FEDCM_HEADERS }
+        );
+      }
       const data: FedCMTokenRequest = await request.json();
+      // For mock IdP, we accept any client_id and origin
+      // Just verify that the account_id is one of our mock accounts
+      const accounts = await getMockAccounts();
+      const isValidAccount = accounts.accounts.some(
+        (account) => account.id === data.account_id
+      );
+
+      if (!isValidAccount) {
+        return NextResponse.json(
+          { error: 'Invalid account_id' },
+          {
+            status: 400,
+            headers: FEDCM_HEADERS,
+          }
+        );
+      }
+
+      // Generate token
       const token = generateToken(data.account_id, data.client_id);
 
       return NextResponse.json(
@@ -172,10 +235,7 @@ export async function POST(
   }
 
   return NextResponse.json(
-    { error: 'Not found' },
-    {
-      status: 404,
-      headers: FEDCM_HEADERS,
-    }
+    { error: 'Route not supported' },
+    { status: 405, headers: FEDCM_HEADERS }
   );
 }
