@@ -56,8 +56,9 @@ function isValidFedCMRoute(route: string): route is FedCMRoute {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { route: string } }
+  props: { params: Promise<{ route: string }> }
 ) {
+  const params = await props.params;
   const route = params.route;
 
   // Enable CORS
@@ -159,8 +160,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { route: string } }
+  props: { params: Promise<{ route: string }> }
 ) {
+  const params = await props.params;
   const route = params.route;
 
   // Enable CORS

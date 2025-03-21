@@ -22,7 +22,7 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const response = await fetch('/idp/api/auth/login', {
+      const response = await fetch('/api/auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
