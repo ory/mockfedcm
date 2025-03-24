@@ -9,12 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ory/client-fetch": "^1.18.5",
-    "@types/dompurify": "^3.0.5",
+    "@ory/client-fetch": "^1.19.0",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.4",
     "jsonwebtoken": "^9.0.2",
-    "next": "15.2.2",
+    "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "uuid": "^11.1.0"
@@ -27,9 +26,9 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "daisyui": "^5.0.3",
+    "daisyui": "^5.0.9",
     "eslint": "^9",
-    "eslint-config-next": "15.2.2",
+    "eslint-config-next": "15.2.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
