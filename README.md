@@ -8,7 +8,6 @@ A mock implementation of the [FedCM (Federated Credential Management) API](https
 - 🔑 FedCM Relying Party (RP) testing tools
 - ⚡ Built with Next.js 15 and TypeScript
 - 🎨 Modern UI with Tailwind CSS and DaisyUI
-- 🔒 Integration with Ory for identity management
 - 🧪 Testing utilities for FedCM implementations
 
 ## Prerequisites
@@ -45,12 +44,11 @@ pnpm install
 
    - Update the following variables in `.env.local`:
      - `APP_FQDN`: Your application's domain (default: localhost:3000)
-     - `ORY_BASE_PATH`: Your Ory project URL
-     - `ORY_API_KEY`: Your Ory API key
      - `JWT_SECRET`: A secure secret for JWT signing
      - `FEDCM_PROVIDER_NAME`: Your IdP name
      - `FEDCM_BACKGROUND_COLOR`: Brand color for the FedCM UI
      - `FEDCM_TEXT_COLOR`: Text color for the FedCM UI
+     - `BYPASS_SEC_FETCH_CHECK`: Bypass Sec-Fetch-Dest checks for development
 
 4. Run the development server:
 
@@ -69,7 +67,17 @@ The application will be available at [http://localhost:3000](http://localhost:30
 ```
 src/
 ├── app/                    # Next.js app router pages
+│   ├── api/               # API routes
+│   │   ├── auth/         # Authentication endpoints
+│   │   └── fedcm/        # FedCM API endpoints
+│   ├── .well-known/      # Well-known endpoints
+│   │   └── web-identity/ # FedCM web-identity endpoint
+│   ├── idp/              # Identity Provider pages
+│   │   └── _components/  # IdP-specific components
+│   └── rp/               # Relying Party pages
+│       └── _components/  # RP-specific components
 ├── components/            # Reusable React components
+│   └── ui/               # UI components (buttons, inputs, etc.)
 ├── lib/                   # Core functionality and utilities
 │   └── fedcm.ts          # FedCM implementation
 ├── types/                 # TypeScript type definitions
@@ -82,10 +90,13 @@ src/
 
 The project implements all required FedCM IdP endpoints:
 
-- `accounts_endpoint`: Returns available user accounts
-- `client_metadata_endpoint`: Provides client application metadata
-- `id_assertion_endpoint`: Issues identity tokens
-- `disconnect_endpoint`: Handles account disconnection
+- `/.well-known/web-identity`: Returns the provider URLs configuration
+- `/api/fedcm/config.json`: Returns the manifest URL configuration
+- `/api/fedcm/manifest`: Returns the FedCM manifest
+- `/api/fedcm/accounts`: Returns available user accounts
+- `/api/fedcm/client-metadata`: Provides client application metadata
+- `/api/fedcm/token`: Issues identity tokens
+- `/api/fedcm/disconnect`: Handles account disconnection
 
 ### As a Relying Party (RP)
 
@@ -95,6 +106,7 @@ Includes a testing interface for FedCM RP implementations with features like:
 - Auto-testing capabilities
 - JSON configuration preview
 - Nonce management
+- Modern UI with toggle switches and joined inputs
 
 ## Development
 
@@ -105,15 +117,14 @@ Includes a testing interface for FedCM RP implementations with features like:
 
 ## Environment Variables
 
-| Variable                 | Description         | Default        |
-| ------------------------ | ------------------- | -------------- |
-| `APP_FQDN`               | Application domain  | localhost:3000 |
-| `ORY_BASE_PATH`          | Ory project URL     | -              |
-| `ORY_API_KEY`            | Ory API key         | -              |
-| `JWT_SECRET`             | JWT signing secret  | -              |
-| `FEDCM_PROVIDER_NAME`    | IdP name            | Mock FedCM IdP |
-| `FEDCM_BACKGROUND_COLOR` | UI background color | #ffffff        |
-| `FEDCM_TEXT_COLOR`       | UI text color       | #000000        |
+| Variable                 | Description                           | Default        |
+| ------------------------ | ------------------------------------- | -------------- |
+| `APP_FQDN`               | Application domain                    | localhost:3000 |
+| `JWT_SECRET`             | JWT signing secret                    | -              |
+| `FEDCM_PROVIDER_NAME`    | IdP name                              | Mock FedCM IdP |
+| `FEDCM_BACKGROUND_COLOR` | UI background color                   | #ffffff        |
+| `FEDCM_TEXT_COLOR`       | UI text color                         | #000000        |
+| `BYPASS_SEC_FETCH_CHECK` | Bypass security checks in development | false          |
 
 ## Contributing
 

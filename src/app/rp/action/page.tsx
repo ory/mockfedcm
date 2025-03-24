@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface BrandingIcon {
@@ -39,7 +39,7 @@ interface CredentialRequestOptions {
   signal?: AbortSignal;
 }
 
-export default function RPActionPage() {
+function RPActionContent() {
   const searchParams = useSearchParams();
   const configURL = searchParams.get('configURL');
   const clientId = searchParams.get('clientId');
@@ -340,5 +340,24 @@ export default function RPActionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RPActionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='min-h-screen bg-base-200 flex flex-col items-center justify-center p-4'>
+          <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
+            <div className='card-body items-center text-center'>
+              <span className='loading loading-spinner loading-lg text-primary'></span>
+              <h2 className='card-title mt-4'>Loading...</h2>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <RPActionContent />
+    </Suspense>
   );
 }

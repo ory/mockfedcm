@@ -1,13 +1,10 @@
 import { cookies } from 'next/headers';
 import {
-  FedCMAccount,
   FedCMAccountsResponse,
   FedCMClientMetadataResponse,
   FedCMManifestResponse,
 } from '@/types/fedcm';
-import { validateSession, getIdentity } from '@/lib/ory';
-import { Identity } from '@ory/client-fetch';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export const FEDCM_COOKIE_NAME = 'fedcm_session';
 
@@ -19,10 +16,10 @@ export function getManifestResponse(): FedCMManifestResponse {
   const baseUrl = `${protocol}://${IDP_DOMAIN}`;
 
   return {
-    accounts_endpoint: `/idp/api/fedcm/accounts`,
-    client_metadata_endpoint: `/idp/api/fedcm/client-metadata`,
-    id_assertion_endpoint: `/idp/api/fedcm/token`,
-    disconnect_endpoint: `/idp/api/fedcm/disconnect`,
+    accounts_endpoint: `/api/fedcm/accounts`,
+    client_metadata_endpoint: `/api/fedcm/client-metadata`,
+    id_assertion_endpoint: `/api/fedcm/token`,
+    disconnect_endpoint: `/api/fedcm/disconnect`,
     login_url: `/idp/login`,
     branding: {
       name: process.env.FEDCM_PROVIDER_NAME || 'FedCM Mock IdP',
@@ -38,63 +35,75 @@ export function getManifestResponse(): FedCMManifestResponse {
   };
 }
 
-export async function getUserFromSession(): Promise<Identity | null> {
+// Get user from cookie
+export async function getUserFromCookie(): Promise<string | null> {
   const cookieStore = await cookies();
-  const sessionToken = cookieStore.get(FEDCM_COOKIE_NAME)?.value;
+  const sessionCookie = cookieStore.get(FEDCM_COOKIE_NAME);
 
-  if (!sessionToken) {
+  if (!sessionCookie?.value) {
     return null;
   }
 
   try {
-    const session = await validateSession(sessionToken);
-    return await getIdentity(session.identity?.id || '');
+    // Verify the JWT to ensure it's valid
+    const payload = jwt.verify(sessionCookie.value, JWT_SECRET) as {
+      username: string;
+    };
+    return payload.username;
   } catch (error) {
-    console.error('Error validating session:', error);
+    console.error('Error verifying session cookie:', error);
     return null;
   }
 }
 
-export function oryIdentityToFedCMAccount(identity: Identity): FedCMAccount {
-  // Extract relevant information from Ory Identity traits
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const traits = identity.traits as any;
-  const metadata = identity.metadata_public as {
-    approved_clients?: string[];
-  } | null;
-
-  return {
-    id: identity.id,
-    name: traits.name?.full || traits.email,
-    email: traits.email,
-    given_name: traits.name?.first,
-    picture: traits.picture,
-    approved_clients: metadata?.approved_clients || [],
-  };
+// Create a signed cookie with username
+export function createUserCookie(username: string): string {
+  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+  return token;
 }
 
-export async function getAccounts(): Promise<FedCMAccountsResponse> {
-  const user = await getUserFromSession();
+// Generate mock accounts for current user
+export async function getMockAccounts(): Promise<FedCMAccountsResponse> {
+  const username = await getUserFromCookie();
 
-  if (!user) {
+  if (!username) {
     return { accounts: [] };
   }
 
+  // Create two mock accounts based on the username
   return {
-    accounts: [oryIdentityToFedCMAccount(user)],
+    accounts: [
+      {
+        id: `${username}-personal`,
+        name: `${username} (Personal)`,
+        email: `${username}@example.com`,
+        given_name: username,
+        picture: 'https://picsum.photos/id/1005/200',
+        approved_clients: [],
+      },
+      {
+        id: `${username}-work`,
+        name: `${username} (Work)`,
+        email: `${username}@work-example.com`,
+        given_name: username,
+        picture: 'https://picsum.photos/id/1012/200',
+        approved_clients: [],
+      },
+    ],
   };
 }
 
+// Return client metadata (accept any client_id)
 export function getClientMetadata(
   clientId: string
 ): FedCMClientMetadataResponse {
-  // In a real implementation, you would look up the client information from a database
   return {
     privacy_policy_url: `https://${clientId}/privacy`,
     terms_of_service_url: `https://${clientId}/terms`,
   };
 }
 
+// Generate a token for the given account_id and client_id
 export function generateToken(accountId: string, clientId: string): string {
   // Create a JWT token for the user
   const payload = {
