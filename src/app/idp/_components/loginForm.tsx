@@ -51,47 +51,51 @@ export default function LoginForm() {
   };
 
   return (
-    <div className='card w-96 bg-base-100 shadow-xl'>
-      <div className='card-body'>
-        <h2 className='card-title'>Sign In</h2>
+    <div className='w-full flex justify-center'>
+      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
+        <div className='card-body'>
+          <h2 className='card-title'>Sign In</h2>
 
-        {error && (
-          <div className='alert alert-error'>
-            <span>{error}</span>
-          </div>
-        )}
+          {error && (
+            <div className='alert alert-error'>
+              <span>{error}</span>
+            </div>
+          )}
 
-        {success && (
-          <div className='alert alert-success'>
-            <span>Successfully signed in! Redirecting...</span>
-          </div>
-        )}
+          {success && (
+            <div className='alert alert-success'>
+              <span>Successfully signed in! Redirecting...</span>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <TextInput
-            type='email'
-            label='Email'
-            value={formData.email}
-            placeholder='Email'
-            className='input input-bordered'
-            onChange={(value) => setFormData({ ...formData, email: value })}
-            required
-          />
-          <TextInput
-            type='password'
-            label='Password'
-            value={formData.password}
-            placeholder='Password'
-            className='input input-bordered'
-            onChange={(value) => setFormData({ ...formData, password: value })}
-            required
-          />
-          <div className='pt-4'>
-            <Button type='submit' disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </div>
-        </form>
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            <TextInput
+              type='email'
+              label='Email'
+              value={formData.email}
+              placeholder='Email'
+              className='input input-bordered'
+              onChange={(value) => setFormData({ ...formData, email: value })}
+              required
+            />
+            <TextInput
+              type='password'
+              label='Password'
+              value={formData.password}
+              placeholder='Password'
+              className='input input-bordered'
+              onChange={(value) =>
+                setFormData({ ...formData, password: value })
+              }
+              required
+            />
+            <div className='pt-4'>
+              <Button type='submit' disabled={loading}>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,7 @@
+'use client';
 import cn from 'clsx';
+import createDOMPurify from 'dompurify';
+import { useEffect, useState } from 'react';
 
 export enum AlertType {
   SUCCESS = 'alert-success',
@@ -13,9 +16,29 @@ interface Props {
   className: string;
   alertType: AlertType;
   message: string;
+  allowHtml?: boolean;
 }
 
-const AlertMessage = ({ className, alertType, message }: Props) => {
+const AlertMessage = ({
+  className,
+  alertType,
+  message,
+  allowHtml = false,
+}: Props) => {
+  const [sanitizedMessage, setSanitizedMessage] = useState<string>('');
+
+  useEffect(() => {
+    if (allowHtml) {
+      const sanitizedHtml = createDOMPurify(window).sanitize(message, {
+        ALLOWED_TAGS: ['a', 'b', 'i', 'em', 'strong', 'p', 'br'],
+        ALLOWED_ATTR: ['href', 'target', 'rel'],
+      });
+      setSanitizedMessage(sanitizedHtml);
+    } else {
+      setSanitizedMessage(message);
+    }
+  }, [message, allowHtml]);
+
   const renderIcon = () => {
     switch (alertType) {
       case AlertType.ERROR:
@@ -96,11 +119,24 @@ const AlertMessage = ({ className, alertType, message }: Props) => {
     }
   };
 
+  const renderMessage = () => {
+    if (!allowHtml) {
+      return <span className='text-white'>{message}</span>;
+    }
+
+    return (
+      <span
+        className='text-white [&_a]:underline [&_a]:hover:opacity-80'
+        dangerouslySetInnerHTML={{ __html: sanitizedMessage }}
+      />
+    );
+  };
+
   return (
     <div className={cn('alert ', alertType, className)}>
       <div className='flex items-center gap-3'>
         <div className='flex-shrink-0 text-white'>{renderIcon()}</div>
-        <span className='text-white'>{message}</span>
+        {renderMessage()}
       </div>
     </div>
   );
