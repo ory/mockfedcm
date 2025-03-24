@@ -84,6 +84,10 @@ function EndpointsList() {
 
     setEndpoints([
       {
+        label: 'IdP config',
+        url: getEndpointUrl('/api/fedcm/config.json'),
+      },
+      {
         label: 'Discovery endpoint',
         url: getEndpointUrl('/.well-known/fedcm.json'),
       },

@@ -22,7 +22,8 @@ type FedCMRoute =
   | 'accounts'
   | 'client-metadata'
   | 'disconnect'
-  | 'token';
+  | 'token'
+  | 'config.json';
 
 // Validate if the request is coming from the FedCM API
 function validateFedCMRequest(
@@ -50,6 +51,7 @@ function isValidFedCMRoute(route: string): route is FedCMRoute {
     'client-metadata',
     'disconnect',
     'token',
+    'config.json',
   ];
   return validRoutes.includes(route as FedCMRoute);
 }
@@ -75,6 +77,7 @@ export async function GET(
 
   // Handle different FedCM API endpoints
   switch (route) {
+    case 'config.json':
     case 'manifest':
       // Manifest is public and doesn't need Sec-Fetch-Dest validation
       return NextResponse.json(getManifestResponse(), {
