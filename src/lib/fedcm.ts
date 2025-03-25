@@ -20,7 +20,7 @@ export function getManifestResponse(): FedCMManifestResponse {
     client_metadata_endpoint: `/api/fedcm/client-metadata`,
     id_assertion_endpoint: `/api/fedcm/token`,
     disconnect_endpoint: `/api/fedcm/disconnect`,
-    login_url: `/idp/login`,
+    login_url: `/idp`,
     branding: {
       name: process.env.FEDCM_PROVIDER_NAME || 'FedCM Mock IdP',
       background_color: process.env.FEDCM_BACKGROUND_COLOR || '#ffffff',
