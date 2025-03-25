@@ -73,7 +73,7 @@ function EndpointsList() {
   useEffect(() => {
     // Get the base URL from environment variables
     const baseUrl = process.env.NEXT_PUBLIC_APP_FQDN
-      ? `${process.env.NODE_ENV === 'production' ? 'https' : 'http'}://${
+      ? `${process.env.NODE_ENV === 'production' ? 'https' : 'https'}://${
           process.env.NEXT_PUBLIC_APP_FQDN
         }`
       : '';

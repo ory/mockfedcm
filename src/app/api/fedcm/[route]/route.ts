@@ -12,7 +12,10 @@ import { FedCMTokenRequest } from '@/types/fedcm';
 const FEDCM_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Sec-Fetch-Dest',
+  'Access-Control-Allow-Headers':
+    'Content-Type, Sec-Fetch-Dest, Authorization, X-Requested-With',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Max-Age': '86400',
   'Content-Type': 'application/json',
 };
 
@@ -172,6 +175,9 @@ export async function POST(
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, { headers: FEDCM_HEADERS, status: 204 });
   }
+
+  console.log('route', route);
+  console.log('request', request);
 
   if (!isValidFedCMRoute(route)) {
     return NextResponse.json(

@@ -43,7 +43,7 @@ pnpm install
    ```
 
    - Update the following variables in `.env.local`:
-     - `APP_FQDN`: Your application's domain (default: localhost:3000)
+     - `NEXT_PUBLIC_APP_FQDN`: Your application's domain (default: localhost:3000)
      - `JWT_SECRET`: A secure secret for JWT signing
      - `FEDCM_PROVIDER_NAME`: Your IdP name
      - `FEDCM_BACKGROUND_COLOR`: Brand color for the FedCM UI
