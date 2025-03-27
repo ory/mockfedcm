@@ -176,9 +176,6 @@ export async function POST(
     return new NextResponse(null, { headers: FEDCM_HEADERS, status: 204 });
   }
 
-  console.log('route', route);
-  console.log('request', request);
-
   if (!isValidFedCMRoute(route)) {
     return NextResponse.json(
       { error: 'Invalid route' },
@@ -199,6 +196,21 @@ export async function POST(
       );
     }
 
+    // Validate content type
+    const contentType = request.headers.get('content-type');
+    if (!contentType?.includes('application/x-www-form-urlencoded')) {
+      return NextResponse.json(
+        {
+          error:
+            'Invalid content type. Expected application/x-www-form-urlencoded',
+        },
+        {
+          status: 415,
+          headers: FEDCM_HEADERS,
+        }
+      );
+    }
+
     try {
       const username = await getUserFromCookie();
       if (!username) {
@@ -207,14 +219,42 @@ export async function POST(
           { status: 401, headers: FEDCM_HEADERS }
         );
       }
-      const data: FedCMTokenRequest = await request.json();
+
+      // Parse form data
+      const formData = await request.formData();
+      const accountId = formData.get('account_id');
+      const clientId = formData.get('client_id');
+      const nonce = formData.get('nonce');
+      const disclosureTextShown = formData.get('disclosure_text_shown');
+
+      if (!accountId || !clientId || !nonce || !disclosureTextShown) {
+        return NextResponse.json(
+          {
+            error:
+              'Missing required fields: account_id, client_id, nonce, and disclosure_text_shown',
+          },
+          {
+            status: 400,
+            headers: FEDCM_HEADERS,
+          }
+        );
+      }
+
+      const data: FedCMTokenRequest = {
+        account_id: accountId.toString(),
+        client_id: clientId.toString(),
+        nonce: nonce.toString(),
+        disclosure_text_shown: disclosureTextShown.toString() === 'true',
+      };
+
+      console.log('data', data);
       // For mock IdP, we accept any client_id and origin
       // Just verify that the account_id is one of our mock accounts
       const accounts = await getMockAccounts();
       const isValidAccount = accounts.accounts.some(
         (account) => account.id === data.account_id
       );
-
+      console.log('isValidAccount', isValidAccount);
       if (!isValidAccount) {
         return NextResponse.json(
           { error: 'Invalid account_id' },
@@ -224,10 +264,8 @@ export async function POST(
           }
         );
       }
-
       // Generate token
       const token = generateToken(data.account_id, data.client_id);
-
       return NextResponse.json(
         { token },
         {
