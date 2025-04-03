@@ -215,7 +215,7 @@ function RPActionContent() {
     // Don't attempt authentication if we've already tried or prerequisites aren't met
     // or if authentication is currently in progress
     if (
-      authAttempted ||
+      authAttempted || // Check if already attempted for this config set
       !isFedCMSupported ||
       idpConfigs.length === 0 ||
       Object.keys(idpProviderConfigs).length === 0 ||
@@ -227,11 +227,10 @@ function RPActionContent() {
     }
 
     const attemptFedCMAuth = async () => {
-      // Mark that we've attempted authentication to prevent infinite loops
-      setAuthAttempted(true);
-
       // Set the auth in progress flag
       authInProgressRef.current = true;
+      // Clear previous errors before a new attempt
+      setError(null);
 
       try {
         // Create providers array from all valid IdP configurations
@@ -260,11 +259,11 @@ function RPActionContent() {
           });
 
         if (providers.length === 0) {
+          // This case should ideally be handled earlier, but double-check
           setError(
             'No valid provider configurations available for authentication'
           );
-          // Clear the auth in progress flag before returning
-          authInProgressRef.current = false;
+          // No need to set authAttempted here, let finally handle it
           return;
         }
 
@@ -291,47 +290,37 @@ function RPActionContent() {
           setIsAuthenticated(false);
         }
       } catch (err: unknown) {
+        // Catch errors during provider/request preparation
         console.error('Error preparing authentication request:', err);
         setError(`Error preparing authentication: ${err}`);
       } finally {
+        // Mark as attempted *after* the attempt finishes
+        setAuthAttempted(true);
         // Always clear the auth in progress flag when done
         authInProgressRef.current = false;
       }
     };
 
-    // Execute the authentication attempt
     attemptFedCMAuth();
   }, [
+    // Dependencies that should trigger a re-attempt if they change
     isFedCMSupported,
     idpConfigs,
     idpProviderConfigs,
+    globalContext,
+    // Control flags/state
     loading,
     isAuthenticated,
-    globalContext,
-    authAttempted,
-    fedCMResponse,
+    authAttempted, // Include authAttempted to react to its reset
   ]);
 
-  // Reset auth attempt if dependencies change and no auth is in progress
+  // Reset auth attempt ONLY when core configuration changes
   useEffect(() => {
-    if (
-      authAttempted &&
-      idpConfigs.length > 0 &&
-      Object.keys(idpProviderConfigs).length > 0 &&
-      !authInProgressRef.current && // Only reset if no auth is in progress
-      !isAuthenticated // Only reset if not authenticated
-    ) {
-      // Only reset if we have the necessary data to attempt authentication again
-      console.log('Resetting auth attempt flag to allow new attempt');
-      setAuthAttempted(false);
-    }
-  }, [
-    idpConfigs,
-    idpProviderConfigs,
-    globalContext,
-    authAttempted,
-    isAuthenticated,
-  ]);
+    console.log('Core config changed, resetting authAttempted.');
+    setAuthAttempted(false);
+    // Optionally clear error when config changes, as the next attempt might succeed
+    // setError(null);
+  }, [idpConfigs, idpProviderConfigs, globalContext]);
 
   // Log the fedCMResponse state, decode token, and create serializable object when it updates
   useEffect(() => {

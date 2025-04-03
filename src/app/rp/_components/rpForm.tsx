@@ -45,6 +45,8 @@ const FedCMRPForm = () => {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [testTimerId, setTestTimerId] = useState<NodeJS.Timeout | null>(null);
 
+  const initialDefaultIdpName = 'Default IdP'; // Store the default name
+
   // Save IdP configuration to localStorage
   const saveIdpToLocalStorage = useCallback((idp: FedCMConfig) => {
     if (!idp.name) return;
@@ -359,8 +361,25 @@ const FedCMRPForm = () => {
       loginHint: '',
     };
 
-    setIdps((prevIdps) => [...prevIdps, newIdp]);
-  }, []);
+    // Check if the current state only contains the initial, unmodified placeholder
+    const isOnlyDefaultAndLikelyUnmodified =
+      idps.length === 1 &&
+      idps[0].name === initialDefaultIdpName &&
+      idps[0].configURL === '' &&
+      idps[0].clientId === '' &&
+      idps[0].useLoginHint === false &&
+      (idps[0].loginHint === '' ||
+        idps[0].loginHint === undefined ||
+        idps[0].loginHint === null);
+
+    if (isOnlyDefaultAndLikelyUnmodified) {
+      // If only the unmodified default exists, replace it
+      setIdps([newIdp]);
+    } else {
+      // Otherwise, add the new IdP to the existing list
+      setIdps((prevIdps) => [...prevIdps, newIdp]);
+    }
+  }, [idps]); // Dependency on idps is needed for the conditional check
 
   return (
     <div className='w-full flex justify-center'>
