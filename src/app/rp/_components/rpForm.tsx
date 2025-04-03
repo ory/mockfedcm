@@ -352,8 +352,20 @@ const FedCMRPForm = () => {
     const newClientId = generateClientId();
     const configURL = `${baseUrl}/api/fedcm/config.json`;
 
+    // Determine the unique name for the new MockFedCM IdP
+    const baseName = 'MockFedCM IdP';
+    let newName = baseName;
+    let counter = 1;
+    const existingNames = new Set(idps.map((idp) => idp.name));
+
+    // Keep incrementing the counter until a unique name is found
+    while (existingNames.has(newName)) {
+      newName = `${baseName} ${counter}`;
+      counter++;
+    }
+
     const newIdp: FedCMConfig = {
-      name: 'MockFedCM IdP', // Default name
+      name: newName,
       configURL: configURL,
       clientId: newClientId,
       nonce: newNonce,
@@ -379,7 +391,7 @@ const FedCMRPForm = () => {
       // Otherwise, add the new IdP to the existing list
       setIdps((prevIdps) => [...prevIdps, newIdp]);
     }
-  }, [idps]); // Dependency on idps is needed for the conditional check
+  }, [idps]); // Dependency on idps is needed for the conditional check and name generation
 
   return (
     <div className='w-full flex justify-center'>
