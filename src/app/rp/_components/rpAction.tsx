@@ -77,6 +77,9 @@ function RPActionContent() {
   >(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authAttempted, setAuthAttempted] = useState<boolean>(false);
+  // Add state to specifically track login-related errors
+  const [isLoginRequiredError, setIsLoginRequiredError] =
+    useState<boolean>(false);
 
   // Add refs to track if operations have been performed
   const configsLoadedRef = useRef<boolean>(false);
@@ -229,8 +232,9 @@ function RPActionContent() {
     const attemptFedCMAuth = async () => {
       // Set the auth in progress flag
       authInProgressRef.current = true;
-      // Clear previous errors before a new attempt
+      // Clear previous errors and login required flag before a new attempt
       setError(null);
+      setIsLoginRequiredError(false);
 
       try {
         // Create providers array from all valid IdP configurations
@@ -259,23 +263,16 @@ function RPActionContent() {
           });
 
         if (providers.length === 0) {
-          // This case should ideally be handled earlier, but double-check
           setError(
             'No valid provider configurations available for authentication'
           );
-          // No need to set authAttempted here, let finally handle it
           return;
         }
 
-        // Create request options according to FedCM API specification
         const requestOptions: CredentialRequestOptions = {
-          identity: {
-            providers: providers,
-            context: globalContext,
-          },
+          identity: { providers: providers, context: globalContext },
           mediation: 'optional',
         };
-
         setFedCMRequest(requestOptions);
 
         try {
@@ -286,8 +283,19 @@ function RPActionContent() {
           setIsAuthenticated(true);
         } catch (err: unknown) {
           console.error('FedCM authentication request failed:', err);
-          setError(`FedCM authentication failed: ${err}`);
+          const errorMessage = `FedCM authentication failed: ${err}`;
+          setError(errorMessage);
           setIsAuthenticated(false);
+
+          // Check if the error suggests login is required
+          if (
+            err instanceof Error &&
+            (err.name === 'IdentityCredentialError' ||
+              err.name === 'NetworkError')
+          ) {
+            console.log('Detected potential login required error:', err.name);
+            setIsLoginRequiredError(true);
+          }
         }
       } catch (err: unknown) {
         // Catch errors during provider/request preparation
@@ -406,7 +414,7 @@ function RPActionContent() {
   }
 
   if (
-    error &&
+    isLoginRequiredError && // Use the new specific state flag
     !isAuthenticated &&
     Object.values(idpProviderConfigs).some((config) => config.login_url)
   ) {
