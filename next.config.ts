@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  allowedDevOrigins: ['d599481a27fb.ngrok.app'],
+  allowedDevOrigins: ['d599481a27fb.ngrok.app', 'localhost'],
 };
 
 export default nextConfig;

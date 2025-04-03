@@ -1,33 +1,3 @@
-declare global {
-  interface Navigator {
-    credentials: {
-      get(options: CredentialRequestOptions): Promise<FedCMCredential>;
-      // Include other credential methods as needed
-    };
-  }
-}
-
-// Following the FedCM API spec at https://developer.mozilla.org/en-US/docs/Web/API/FedCM_API/RP_sign-in
-interface CredentialRequestOptions {
-  identity?: {
-    providers: Array<{
-      configURL: string;
-      clientId: string;
-      nonce?: string;
-      loginHint?: string;
-    }>;
-    context?: string;
-  };
-  mediation?: 'optional' | 'required' | 'silent';
-  signal?: AbortSignal;
-}
-
-interface FedCMCredential {
-  type: string;
-  token: string;
-  [key: string]: unknown; // For additional properties returned by the IdP
-}
-
 export interface FedCMConfigResponse {
   provider_urls: string[];
 }
