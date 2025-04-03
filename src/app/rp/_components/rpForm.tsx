@@ -6,6 +6,8 @@ import ToggleInput from '@/components/ui/toggle';
 import Button from '@/components/ui/button';
 import ContextSelect, { FedCMContext } from './contextSelect';
 import { generateNonce } from '@/utils/generateNonce';
+import { generateClientId } from '@/utils/generateClientId';
+import { isHttpsEnabled } from '@/utils/https';
 import {
   FEDCM_IDP_LIST_KEY,
   FEDCM_IDP_PREFIX,
@@ -42,6 +44,8 @@ const FedCMRPForm = () => {
   const [autoTest, setAutoTest] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [testTimerId, setTestTimerId] = useState<NodeJS.Timeout | null>(null);
+
+  const initialDefaultIdpName = 'Default IdP'; // Store the default name
 
   // Save IdP configuration to localStorage
   const saveIdpToLocalStorage = useCallback((idp: FedCMConfig) => {
@@ -332,6 +336,63 @@ const FedCMRPForm = () => {
     ]
   );
 
+  // Function to add the MockFedCM IdP
+  const addMockFedCMIdp = useCallback(() => {
+    const protocol = isHttpsEnabled() ? 'https' : 'http';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_FQDN
+      ? `${protocol}://${process.env.NEXT_PUBLIC_APP_FQDN}`
+      : ''; // Fallback or error handling might be needed if FQDN is missing
+
+    if (!baseUrl) {
+      alert('Error: NEXT_PUBLIC_APP_FQDN environment variable is not set.');
+      return;
+    }
+
+    const newNonce = generateNonce();
+    const newClientId = generateClientId();
+    const configURL = `${baseUrl}/api/fedcm/config.json`;
+
+    // Determine the unique name for the new MockFedCM IdP
+    const baseName = 'MockFedCM IdP';
+    let newName = baseName;
+    let counter = 1;
+    const existingNames = new Set(idps.map((idp) => idp.name));
+
+    // Keep incrementing the counter until a unique name is found
+    while (existingNames.has(newName)) {
+      newName = `${baseName} ${counter}`;
+      counter++;
+    }
+
+    const newIdp: FedCMConfig = {
+      name: newName,
+      configURL: configURL,
+      clientId: newClientId,
+      nonce: newNonce,
+      useLoginHint: false,
+      loginHint: '',
+    };
+
+    // Check if the current state only contains the initial, unmodified placeholder
+    const isOnlyDefaultAndLikelyUnmodified =
+      idps.length === 1 &&
+      idps[0].name === initialDefaultIdpName &&
+      idps[0].configURL === '' &&
+      idps[0].clientId === '' &&
+      idps[0].useLoginHint === false &&
+      (idps[0].loginHint === '' ||
+        idps[0].loginHint === undefined ||
+        idps[0].loginHint === null);
+
+    if (isOnlyDefaultAndLikelyUnmodified) {
+      // If only the unmodified default exists, replace it
+      setIdps([newIdp]);
+    } else {
+      // Otherwise, add the new IdP to the existing list
+      setIdps((prevIdps) => [...prevIdps, newIdp]);
+    }
+  }, [idps]); // Dependency on idps is needed for the conditional check and name generation
+
   return (
     <div className='w-full flex justify-center'>
       <div className='card w-full max-w-2xl bg-base-100 shadow-xl'>
@@ -347,6 +408,36 @@ const FedCMRPForm = () => {
                 value={globalContext}
                 onChange={(value) => setGlobalContext(value)}
               />
+            </div>
+
+            {/* Button to add MockFedCM IdP - Place it between Global Settings and the IdP list */}
+            <div className='flex justify-center'>
+              <Button
+                type='button'
+                onClick={addMockFedCMIdp}
+                variant='ghost'
+                className='gap-2'
+              >
+                {/* Optional: Add an icon */}
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='16'
+                  height='16'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  className='lucide lucide-webhook'
+                >
+                  <path d='M18 16.98h-5.91a4 4 0 0 1-7.76-.81l-.3-1.68a4 4 0 0 1 .52-3.9l1.34-1.6A4 4 0 0 1 9.04 7c.52 0 1 .11 1.46.32l1.04.5a4 4 0 0 1 3.58 3.5l.5 1.03A4 4 0 0 1 18 16.98Z' />
+                  <path d='M12 7V2l5 5' />
+                  <path d='m7 19 5-5' />
+                  <path d='m12 14 5 5' />
+                </svg>
+                Use MockFedCM IdP
+              </Button>
             </div>
 
             {idps.map((idp, index) => (
