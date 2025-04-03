@@ -7,6 +7,7 @@ import {
   getUserFromCookie,
 } from '@/lib/fedcm';
 import { FedCMTokenRequest } from '@/types/fedcm';
+import { isRequestHttps, isHttpsEnabled } from '@/utils/https';
 
 // Common FedCM headers
 const FEDCM_HEADERS = {
@@ -46,6 +47,17 @@ function validateFedCMRequest(
   return secFetchDest === expectedDest;
 }
 
+// Get the base URL for the application with proper protocol
+function getBaseUrl(request: NextRequest): string {
+  // Use the request to determine protocol if available
+  const isHttps = request ? isRequestHttps(request) : isHttpsEnabled();
+  const protocol = isHttps ? 'https' : 'http';
+
+  return process.env.NEXT_PUBLIC_APP_FQDN
+    ? `${protocol}://${process.env.NEXT_PUBLIC_APP_FQDN}`
+    : '';
+}
+
 // Validate if the route is a valid FedCM route
 function isValidFedCMRoute(route: string): route is FedCMRoute {
   const validRoutes: FedCMRoute[] = [
@@ -82,8 +94,10 @@ export async function GET(
   switch (route) {
     case 'config.json':
     case 'manifest':
+      // Get base URL with proper protocol
+      const baseUrl = getBaseUrl(request);
       // Manifest is public and doesn't need Sec-Fetch-Dest validation
-      return NextResponse.json(getManifestResponse(), {
+      return NextResponse.json(getManifestResponse(baseUrl), {
         headers: FEDCM_HEADERS,
       });
 
@@ -247,14 +261,12 @@ export async function POST(
         disclosure_text_shown: disclosureTextShown.toString() === 'true',
       };
 
-      console.log('data', data);
       // For mock IdP, we accept any client_id and origin
       // Just verify that the account_id is one of our mock accounts
       const accounts = await getMockAccounts();
       const isValidAccount = accounts.accounts.some(
         (account) => account.id === data.account_id
       );
-      console.log('isValidAccount', isValidAccount);
       if (!isValidAccount) {
         return NextResponse.json(
           { error: 'Invalid account_id' },

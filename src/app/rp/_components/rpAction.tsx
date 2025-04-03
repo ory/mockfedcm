@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { FEDCM_IDP_PREFIX } from '@/utils/fedcmStorage';
 
 interface BrandingIcon {
   url: string;
@@ -24,6 +25,16 @@ interface IdpConfig {
   [key: string]: unknown;
 }
 
+// Interface for the saved FedCM IdP configuration
+interface FedCMIdpConfig {
+  name: string;
+  configURL: string;
+  clientId: string;
+  nonce: string;
+  useLoginHint: boolean;
+  loginHint?: string;
+}
+
 // Following the FedCM API specification for credential requests
 interface CredentialRequestOptions {
   identity?: {
@@ -41,22 +52,37 @@ interface CredentialRequestOptions {
 
 function RPActionContent() {
   const searchParams = useSearchParams();
-  const configURL = searchParams.get('configURL');
-  const clientId = searchParams.get('clientId');
-  const nonce = searchParams.get('nonce');
-  const loginHint = searchParams.get('loginHint');
-  const context = searchParams.get('context');
+  const idpNames = searchParams.getAll('idp');
+  const globalContext = searchParams.get('context') || 'signin'; // Default to signin if not provided
 
   const [isFedCMSupported, setIsFedCMSupported] = useState<boolean | null>(
     null
   );
-  const [idpConfig, setIdpConfig] = useState<IdpConfig | null>(null);
+  const [idpConfigs, setIdpConfigs] = useState<FedCMIdpConfig[]>([]);
+  const [idpProviderConfigs, setIdpProviderConfigs] = useState<
+    Record<string, IdpConfig>
+  >({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [fedCMRequest, setFedCMRequest] =
     useState<CredentialRequestOptions | null>(null);
-  const [fedCMResponse, setFedCMResponse] = useState<Credential | null>(null);
+  const [fedCMResponse, setFedCMResponse] = useState<CredentialType | null>(
+    null
+  );
+  const [decodedTokenClaims, setDecodedTokenClaims] = useState<object | null>(
+    null
+  );
+  const [serializableFedCMResponse, setSerializableFedCMResponse] = useState<
+    object | null
+  >(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authAttempted, setAuthAttempted] = useState<boolean>(false);
+
+  // Add refs to track if operations have been performed
+  const configsLoadedRef = useRef<boolean>(false);
+  const providerConfigsFetchedRef = useRef<boolean>(false);
+  // Add a ref to track if authentication is currently in progress
+  const authInProgressRef = useRef<boolean>(false);
 
   // Check if FedCM is supported
   useEffect(() => {
@@ -71,94 +97,307 @@ function RPActionContent() {
     }
   }, []);
 
-  // Fetch IdP configuration
+  // Load configurations from localStorage
   useEffect(() => {
-    const fetchConfig = async () => {
-      if (!configURL) {
-        setError('Missing configURL parameter');
+    // Skip if we've already loaded configurations
+    if (configsLoadedRef.current) {
+      return;
+    }
+
+    if (idpNames.length === 0) {
+      setError('No IdP specified in the URL');
+      setLoading(false);
+      configsLoadedRef.current = true;
+      return;
+    }
+
+    try {
+      const loadedConfigs: FedCMIdpConfig[] = [];
+
+      idpNames.forEach((name) => {
+        const storedConfig = localStorage.getItem(`${FEDCM_IDP_PREFIX}${name}`);
+        if (storedConfig) {
+          try {
+            const parsedConfig = JSON.parse(storedConfig);
+            loadedConfigs.push(parsedConfig);
+          } catch (e) {
+            console.error(`Failed to parse configuration for IdP ${name}`, e);
+          }
+        } else {
+          console.warn(`No stored configuration found for IdP ${name}`);
+        }
+      });
+
+      if (loadedConfigs.length === 0) {
+        setError('No valid IdP configurations found for the specified names');
         setLoading(false);
+        configsLoadedRef.current = true;
         return;
       }
 
-      try {
-        const response = await fetch(configURL);
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch configuration: ${response.status} ${response.statusText}`
+      setIdpConfigs(loadedConfigs);
+      configsLoadedRef.current = true;
+    } catch (e) {
+      setError(`Error loading IdP configurations: ${e}`);
+      setLoading(false);
+      configsLoadedRef.current = true;
+    }
+  }, [idpNames]);
+
+  // Fetch IdP provider configurations
+  useEffect(() => {
+    // Skip if we've already fetched provider configs or if idpConfigs is empty
+    if (providerConfigsFetchedRef.current || idpConfigs.length === 0) {
+      return;
+    }
+
+    // Set to true immediately to prevent multiple fetches
+    providerConfigsFetchedRef.current = true;
+
+    const fetchConfigs = async () => {
+      const configPromises = idpConfigs.map(async (idp) => {
+        try {
+          console.log(
+            `Fetching configuration for ${idp.name} from ${idp.configURL}`
           );
+          const response = await fetch(idp.configURL);
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`
+            );
+          }
+          return { name: idp.name, config: await response.json() };
+        } catch (err) {
+          console.error(
+            `Error fetching IdP configuration for ${idp.name}:`,
+            err
+          );
+          return { name: idp.name, error: err };
         }
-        const config = await response.json();
-        setIdpConfig(config);
+      });
+
+      try {
+        const results = await Promise.all(configPromises);
+        const configsMap: Record<string, IdpConfig> = {};
+        let hasError = false;
+
+        results.forEach((result) => {
+          if ('config' in result) {
+            configsMap[result.name] = result.config;
+          } else {
+            hasError = true;
+          }
+        });
+
+        if (Object.keys(configsMap).length === 0) {
+          setError('Failed to fetch all IdP provider configurations');
+        } else {
+          setIdpProviderConfigs(configsMap);
+          if (hasError) {
+            console.warn(
+              'Some IdP provider configurations could not be loaded'
+            );
+          }
+        }
+
         setLoading(false);
       } catch (err) {
-        setError(`Error fetching IdP configuration: ${err}`);
+        setError(`Error fetching IdP configurations: ${err}`);
         setLoading(false);
       }
     };
 
-    if (configURL) {
-      fetchConfig();
-    } else {
-      setLoading(false);
-    }
-  }, [configURL]);
+    fetchConfigs();
+  }, [idpConfigs]);
 
   // Attempt FedCM authentication
   useEffect(() => {
+    // Don't attempt authentication if we've already tried or prerequisites aren't met
+    // or if authentication is currently in progress
+    if (
+      authAttempted ||
+      !isFedCMSupported ||
+      idpConfigs.length === 0 ||
+      Object.keys(idpProviderConfigs).length === 0 ||
+      loading ||
+      isAuthenticated ||
+      authInProgressRef.current // Check if authentication is already in progress
+    ) {
+      return;
+    }
+
     const attemptFedCMAuth = async () => {
-      if (!isFedCMSupported || !configURL || !clientId || !idpConfig) return;
+      // Mark that we've attempted authentication to prevent infinite loops
+      setAuthAttempted(true);
 
-      // Create request options according to FedCM API specification
-      const requestOptions: CredentialRequestOptions = {
-        identity: {
-          providers: [
-            {
-              configURL: configURL,
-              clientId: clientId,
-            },
-          ],
-        },
-        mediation: 'optional',
-      };
-
-      // Add optional parameters if they exist
-      if (nonce) {
-        requestOptions.identity!.providers[0].nonce = nonce;
-      }
-      if (loginHint) {
-        requestOptions.identity!.providers[0].loginHint = loginHint;
-      }
-      // Context is at the identity level, not in the providers array
-      if (context) {
-        requestOptions.identity!.context = context;
-      }
-
-      setFedCMRequest(requestOptions);
+      // Set the auth in progress flag
+      authInProgressRef.current = true;
 
       try {
-        const credential = await navigator.credentials.get(requestOptions);
-        setFedCMResponse(credential);
-        setIsAuthenticated(true);
+        // Create providers array from all valid IdP configurations
+        const providers = idpConfigs
+          .filter((idp) => idpProviderConfigs[idp.name]) // Only include IdPs with successful provider config fetches
+          .map((idp) => {
+            const provider: {
+              configURL: string;
+              clientId: string;
+              nonce?: string;
+              loginHint?: string;
+            } = {
+              configURL: idp.configURL,
+              clientId: idp.clientId,
+            };
+
+            if (idp.nonce) {
+              provider.nonce = idp.nonce;
+            }
+
+            if (idp.useLoginHint && idp.loginHint) {
+              provider.loginHint = idp.loginHint;
+            }
+
+            return provider;
+          });
+
+        if (providers.length === 0) {
+          setError(
+            'No valid provider configurations available for authentication'
+          );
+          // Clear the auth in progress flag before returning
+          authInProgressRef.current = false;
+          return;
+        }
+
+        // Create request options according to FedCM API specification
+        const requestOptions: CredentialRequestOptions = {
+          identity: {
+            providers: providers,
+            context: globalContext,
+          },
+          mediation: 'optional',
+        };
+
+        setFedCMRequest(requestOptions);
+
+        try {
+          console.log('Initiating FedCM authentication request...');
+          const credential = await navigator.credentials.get(requestOptions);
+          console.log('FedCM authentication request completed successfully');
+          setFedCMResponse(credential);
+          setIsAuthenticated(true);
+        } catch (err: unknown) {
+          console.error('FedCM authentication request failed:', err);
+          setError(`FedCM authentication failed: ${err}`);
+          setIsAuthenticated(false);
+        }
       } catch (err: unknown) {
-        setError(`FedCM authentication failed: ${err}`);
-        setIsAuthenticated(false);
+        console.error('Error preparing authentication request:', err);
+        setError(`Error preparing authentication: ${err}`);
+      } finally {
+        // Always clear the auth in progress flag when done
+        authInProgressRef.current = false;
       }
     };
 
-    if (isFedCMSupported && idpConfig && !isAuthenticated && !loading) {
-      attemptFedCMAuth();
-    }
+    // Execute the authentication attempt
+    attemptFedCMAuth();
   }, [
     isFedCMSupported,
-    idpConfig,
-    configURL,
-    clientId,
-    nonce,
-    loginHint,
-    context,
+    idpConfigs,
+    idpProviderConfigs,
     loading,
     isAuthenticated,
+    globalContext,
+    authAttempted,
+    fedCMResponse,
   ]);
+
+  // Reset auth attempt if dependencies change and no auth is in progress
+  useEffect(() => {
+    if (
+      authAttempted &&
+      idpConfigs.length > 0 &&
+      Object.keys(idpProviderConfigs).length > 0 &&
+      !authInProgressRef.current && // Only reset if no auth is in progress
+      !isAuthenticated // Only reset if not authenticated
+    ) {
+      // Only reset if we have the necessary data to attempt authentication again
+      console.log('Resetting auth attempt flag to allow new attempt');
+      setAuthAttempted(false);
+    }
+  }, [
+    idpConfigs,
+    idpProviderConfigs,
+    globalContext,
+    authAttempted,
+    isAuthenticated,
+  ]);
+
+  // Log the fedCMResponse state, decode token, and create serializable object when it updates
+  useEffect(() => {
+    if (fedCMResponse) {
+      console.log('fedCMResponse (updated state):', fedCMResponse);
+
+      // Create a plain object for serialization
+      const serializableResponse: Record<string, string | undefined | null> = {
+        id: fedCMResponse.id,
+        type: fedCMResponse.type,
+      };
+
+      // Check for properties specific to FederatedCredential
+      if (
+        'provider' in fedCMResponse &&
+        typeof fedCMResponse.provider === 'string'
+      ) {
+        serializableResponse.provider = fedCMResponse.provider;
+      }
+      if ('token' in fedCMResponse && typeof fedCMResponse.token === 'string') {
+        serializableResponse.token = fedCMResponse.token; // Might be truncated in display, full token in claims
+
+        // Decode the token
+        try {
+          const token = fedCMResponse.token;
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+              })
+              .join('')
+          );
+          setDecodedTokenClaims(JSON.parse(jsonPayload));
+          console.log('Decoded JWT Claims:', JSON.parse(jsonPayload));
+        } catch (error) {
+          console.error('Failed to decode JWT token:', error);
+          setDecodedTokenClaims({ error: 'Failed to decode token' });
+        }
+      } else {
+        setDecodedTokenClaims({
+          type: fedCMResponse.type,
+          id: fedCMResponse.id,
+        });
+      }
+
+      // Check for properties specific to PasswordCredential (if needed)
+      if ('name' in fedCMResponse && typeof fedCMResponse.name === 'string') {
+        serializableResponse.name = fedCMResponse.name;
+      }
+      if (
+        'iconURL' in fedCMResponse &&
+        typeof fedCMResponse.iconURL === 'string'
+      ) {
+        serializableResponse.iconURL = fedCMResponse.iconURL;
+      }
+      // Add other credential types properties as needed
+
+      setSerializableFedCMResponse(serializableResponse);
+    } else {
+      setDecodedTokenClaims(null);
+      setSerializableFedCMResponse(null);
+    }
+  }, [fedCMResponse]);
 
   if (!isFedCMSupported) {
     return (
@@ -177,7 +416,16 @@ function RPActionContent() {
     );
   }
 
-  if (error && !isAuthenticated && idpConfig?.login_url) {
+  if (
+    error &&
+    !isAuthenticated &&
+    Object.values(idpProviderConfigs).some((config) => config.login_url)
+  ) {
+    // Find the first provider with a login_url
+    const providerWithLogin = Object.values(idpProviderConfigs).find(
+      (config) => config.login_url
+    );
+
     return (
       <div className='min-h-screen bg-base-200 flex flex-col items-center justify-center p-4'>
         <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
@@ -186,7 +434,10 @@ function RPActionContent() {
             <p>It seems you need to log in to the identity provider first.</p>
             <p className='text-sm text-error mt-2'>{error}</p>
             <div className='card-actions justify-center mt-4'>
-              <a href={idpConfig.login_url} className='btn btn-primary'>
+              <a
+                href={providerWithLogin?.login_url}
+                className='btn btn-primary'
+              >
                 Log in to Identity Provider
               </a>
             </div>
@@ -203,11 +454,8 @@ function RPActionContent() {
           <div className='card-body'>
             <h2 className='card-title text-error'>Error</h2>
             <p>{error}</p>
-            {!configURL && (
-              <p className='mt-2'>Missing required configURL parameter</p>
-            )}
-            {!clientId && (
-              <p className='mt-2'>Missing required clientId parameter</p>
+            {idpNames.length === 0 && (
+              <p className='mt-2'>No IdP names specified in the URL</p>
             )}
           </div>
         </div>
@@ -221,8 +469,8 @@ function RPActionContent() {
         <h1 className='text-3xl font-bold mb-6'>FedCM Authentication</h1>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {/* Status Card */}
-          <div className='card bg-base-100 shadow-xl'>
+          {/* Left Column: Status Card */}
+          <div className='card bg-base-100 shadow-xl self-start'>
             <div className='card-body'>
               <h2 className='card-title'>Authentication Status</h2>
               <div className='mt-4'>
@@ -242,12 +490,16 @@ function RPActionContent() {
                 </div>
               </div>
 
-              {isAuthenticated && fedCMResponse && (
+              {isAuthenticated && decodedTokenClaims && (
                 <div className='mt-4'>
-                  <h3 className='font-semibold text-lg mb-2'>User Details</h3>
+                  <h3 className='font-semibold text-lg mb-2'>
+                    User Details (Decoded Token)
+                  </h3>
                   <div className='bg-base-200 p-3 rounded-lg'>
                     <pre className='overflow-x-auto text-sm'>
-                      {JSON.stringify(fedCMResponse, null, 2)}
+                      {decodedTokenClaims
+                        ? JSON.stringify(decodedTokenClaims, null, 2)
+                        : 'Decoding token or no token received...'}
                     </pre>
                   </div>
                 </div>
@@ -255,37 +507,70 @@ function RPActionContent() {
             </div>
           </div>
 
-          {/* Parameters Card */}
-          <div className='card bg-base-100 shadow-xl'>
-            <div className='card-body'>
-              <h2 className='card-title'>Request Parameters</h2>
-              <div className='overflow-x-auto'>
-                <table className='table table-zebra'>
-                  <tbody>
-                    <tr>
-                      <td className='font-medium'>configURL</td>
-                      <td className='break-all'>
-                        {configURL || 'Not provided'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className='font-medium'>clientId</td>
-                      <td>{clientId || 'Not provided'}</td>
-                    </tr>
-                    <tr>
-                      <td className='font-medium'>nonce</td>
-                      <td>{nonce || 'Not provided'}</td>
-                    </tr>
-                    <tr>
-                      <td className='font-medium'>loginHint</td>
-                      <td>{loginHint || 'Not provided'}</td>
-                    </tr>
-                    <tr>
-                      <td className='font-medium'>context</td>
-                      <td>{context || 'Not provided'}</td>
-                    </tr>
-                  </tbody>
-                </table>
+          {/* Right Column: Configuration Cards */}
+          <div className='flex flex-col gap-6'>
+            {/* IdP Configurations Card */}
+            <div className='card bg-base-100 shadow-xl'>
+              <div className='card-body'>
+                <h2 className='card-title'>IdP Configurations</h2>
+                <div className='overflow-x-auto'>
+                  <table className='table table-zebra'>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {idpConfigs.map((idp, index) => (
+                        <tr key={index}>
+                          <td className='font-medium'>{idp.name}</td>
+                          <td>
+                            <div
+                              className={`badge ${
+                                idpProviderConfigs[idp.name]
+                                  ? 'badge-success'
+                                  : 'badge-error'
+                              }`}
+                            >
+                              {idpProviderConfigs[idp.name]
+                                ? 'Loaded'
+                                : 'Failed'}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Remove global context display from here */}
+              </div>
+            </div>
+
+            {/* Global Context Card */}
+            <div className='card bg-base-100 shadow-xl'>
+              <div className='card-body'>
+                <h2 className='card-title'>Global Settings</h2>
+                <div className='overflow-x-auto'>
+                  <table className='table table-zebra'>
+                    <thead>
+                      <tr>
+                        <th>Setting</th>
+                        <th>Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className='font-medium'>Context</td>
+                        <td>
+                          <div className='badge badge-info'>
+                            {globalContext}
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -316,9 +601,23 @@ function RPActionContent() {
                 <h3 className='card-title'>FedCM Response</h3>
                 <div className='bg-base-200 p-4 rounded-lg'>
                   <pre className='overflow-x-auto text-sm'>
-                    {fedCMResponse
-                      ? JSON.stringify(fedCMResponse, null, 2)
+                    {serializableFedCMResponse
+                      ? JSON.stringify(serializableFedCMResponse, null, 2)
                       : 'No response received yet'}
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* IdP Configurations */}
+            <div className='card bg-base-100 shadow-xl'>
+              <div className='card-body'>
+                <h3 className='card-title'>Loaded IdP Configurations</h3>
+                <div className='bg-base-200 p-4 rounded-lg'>
+                  <pre className='overflow-x-auto text-sm'>
+                    {idpConfigs.length > 0
+                      ? JSON.stringify(idpConfigs, null, 2)
+                      : 'No configurations loaded'}
                   </pre>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { FEDCM_COOKIE_NAME, createUserCookie } from '@/lib/fedcm';
+import { getCookieOptions } from '@/utils/https';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,15 +19,16 @@ export async function POST(request: NextRequest) {
     // Create a session token (JWT) with the username
     const sessionToken = createUserCookie(username);
 
+    // Get cookie options based on HTTPS detection
+    const cookieOptions = getCookieOptions(request);
+
+    console.log(
+      `Setting cookie with options: ${JSON.stringify(cookieOptions)}`
+    );
+
     // Set the session token as a cookie
     const cookieStore = await cookies();
-    cookieStore.set(FEDCM_COOKIE_NAME, sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-      maxAge: 60 * 60 * 24, // 1 day
-      path: '/',
-    });
+    cookieStore.set(FEDCM_COOKIE_NAME, sessionToken, cookieOptions);
 
     return NextResponse.json({
       success: true,

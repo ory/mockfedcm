@@ -11,9 +11,12 @@ export const FEDCM_COOKIE_NAME = 'fedcm_session';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const IDP_DOMAIN = process.env.APP_FQDN || 'localhost:3000';
 
-export function getManifestResponse(): FedCMManifestResponse {
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-  const baseUrl = `${protocol}://${IDP_DOMAIN}`;
+export function getManifestResponse(baseUrl?: string): FedCMManifestResponse {
+  // Use provided baseUrl or fall back to existing logic
+  if (!baseUrl) {
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    baseUrl = `${protocol}://${IDP_DOMAIN}`;
+  }
 
   return {
     accounts_endpoint: `/api/fedcm/accounts`,
@@ -70,22 +73,27 @@ export async function getMockAccounts(): Promise<FedCMAccountsResponse> {
     return { accounts: [] };
   }
 
+  // Parse the username if it's in email format (extract the part before @)
+  const parsedUsername = username.includes('@')
+    ? username.split('@')[0]
+    : username;
+
   // Create two mock accounts based on the username
   return {
     accounts: [
       {
         id: `${username}-personal`,
         name: `${username} (Personal)`,
-        email: `${username}@example.com`,
-        given_name: username,
+        email: `${parsedUsername}@example.com`,
+        given_name: parsedUsername,
         picture: 'https://picsum.photos/id/1005/200',
         approved_clients: [],
       },
       {
         id: `${username}-work`,
         name: `${username} (Work)`,
-        email: `${username}@work-example.com`,
-        given_name: username,
+        email: `${parsedUsername}@work-example.com`,
+        given_name: parsedUsername,
         picture: 'https://picsum.photos/id/1012/200',
         approved_clients: [],
       },

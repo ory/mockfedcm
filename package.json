@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev --turbopack",
+    "dev:https": "NEXT_PUBLIC_USE_HTTPS=true next dev --experimental-https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@ory/client-fetch": "^1.19.0",
+    "@types/webappsec-credential-management": "^0.6.9",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.4",
     "jsonwebtoken": "^9.0.2",
