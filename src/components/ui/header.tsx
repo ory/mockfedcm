@@ -1,55 +1,37 @@
-'use client';
+"use client";
 
-import cn from 'clsx';
-import Image from 'next/image';
-import Link from 'next/link';
+import React from "react";
 
 interface HeaderProps {
   leftContent?: React.ReactNode;
   rightContent?: React.ReactNode;
-  mobileBreakpoint?: 'sm' | 'md' | 'lg';
-  className?: string;
+  logo?: React.ReactNode;
   logoSrc?: string;
-  logoAlt?: string;
   logoWidth?: number;
   logoHeight?: number;
-  logoHref?: string;
+  className?: string;
 }
 
 const Header = ({
   leftContent,
   rightContent,
+  logo,
   className,
-  logoSrc,
-  logoAlt = 'Ory Logo',
-  logoWidth = 80,
-  logoHeight = 40,
-  logoHref = '/',
 }: HeaderProps) => {
   return (
-    <header className={cn('bg-base-100 shadow-md w-full', className)}>
-      <div className='container mx-auto px-4'>
-        <div className='navbar p-0 min-h-16'>
-          {/* Left Side with Logo and Content */}
-          <div className='navbar-start flex items-center flex-wrap'>
-            {logoSrc && (
-              <Link href={logoHref} className='flex items-center'>
-                <Image
-                  src={logoSrc}
-                  alt={logoAlt}
-                  width={logoWidth}
-                  height={logoHeight}
-                  className='object-contain'
-                />
-              </Link>
-            )}
-
-            <div className='flex items-center ml-2'>{leftContent}</div>
-          </div>
-
-          {/* Right Side Content */}
-          <div className='navbar-end flex items-center flex-wrap justify-end'>
-            {rightContent}
+    <header
+      className={`w-full px-1 bg-black border-b border-fuchsia-500 inline-flex flex-col justify-start items-center overflow-hidden ${className}`}
+    >
+      <div className="w-full h-full pl-1 pr-1 bg-black overflow-hidden border-b border-fuchsia-500 flex flex-col justify-start items-center">
+        <div className="w-full max-w-7xl py-4 border-l border-r border-fuchsia-500 flex flex-col justify-start items-start gap-12">
+          <div className="self-stretch px-8 flex justify-between items-start">
+            <div className="flex-1 flex justify-start items-center gap-12 flex-wrap content-center">
+            {logo}
+            {leftContent}
+            </div>
+            <div className="flex-1 flex justify-end items-center gap-4">
+                 {rightContent}
+            </div>
           </div>
         </div>
       </div>
