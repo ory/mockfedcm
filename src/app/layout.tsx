@@ -33,42 +33,46 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const logoSrc = "/logo-ory.svg";
 
   const leftSideContent = (
-      <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-2">
-        <div className="pr-4 inline-flex justify-start items-center gap-4">
-          <Link href="/idp"
-            data-state="Default"
-            className="pt-2 flex justify-center items-center gap-2"
-          >
-            <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
-              Identity Provider
-            </div>
-          </Link>
-          <Link href="/rp"
-            data-state="Default"
-            className="pt-2 flex justify-center items-center gap-2"
-          >
-            <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
-              Relying Party
-            </div>
-          </Link>
-          <Link href="/test"
-            data-state="Default"
-            className="pt-2 flex justify-center items-center gap-2"
-          >
-            <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
-              Test FedCM
-            </div>
-          </Link>
-          <Link href="/about"
-            data-state="Default"
-            className="pt-2 flex justify-center items-center gap-2"
-          >
-            <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
-              About
-            </div>
-          </Link>
-        </div>
+    <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-2">
+      <div className="pr-4 inline-flex justify-start items-center gap-4">
+        <Link
+          href="/idp"
+          data-state="Default"
+          className="pt-2 flex justify-center items-center gap-2"
+        >
+          <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
+            Identity Provider
+          </div>
+        </Link>
+        <Link
+          href="/rp"
+          data-state="Default"
+          className="pt-2 flex justify-center items-center gap-2"
+        >
+          <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
+            Relying Party
+          </div>
+        </Link>
+        <Link
+          href="/rp/action"
+          data-state="Default"
+          className="pt-2 flex justify-center items-center gap-2"
+        >
+          <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
+            Test FedCM
+          </div>
+        </Link>
+        <Link
+          href="/about"
+          data-state="Default"
+          className="pt-2 flex justify-center items-center gap-2"
+        >
+          <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
+            About
+          </div>
+        </Link>
       </div>
+    </div>
   );
 
   const rightSideContent = (
@@ -78,7 +82,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     >
       <div className="min-h-4 flex justify-center items-center gap-3">
         <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none">
-          Integrate FedCM
+          <a href="https://ory.sh">Integrate FedCM</a>
         </div>
       </div>
     </div>
@@ -86,27 +90,27 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
   const logo = (
     <div
-    data-haswordmark="true"
-    data-variant="Default"
-    className="flex justify-start items-center gap-4"
-  >
-    <div className="w-[42px] h-[42px] relative bg-white rounded-[3.5px]">
-      <div className="w-8 h-8 absolute left-[5px] top-[5px] bg-indigo-500">
-      <Link href="/" className="flex items-center">
-        <Image
-          src={logoSrc}
-          alt={"Company Logo"}
-          width={40}
-          height={40}
-          className="object-contain pt-2 px-1"
-        />
-      </Link>
+      data-haswordmark="true"
+      data-variant="Default"
+      className="flex justify-start items-center gap-4"
+    >
+      <div className="w-[42px] h-[42px] relative bg-white rounded-[3.5px]">
+        <div className="w-8 h-8 absolute left-[5px] top-[5px] bg-indigo-500">
+          <Link href="/" className="flex items-center">
+            <Image
+              src={logoSrc}
+              alt={"Company Logo"}
+              width={40}
+              height={40}
+              className="object-contain pt-2 px-1"
+            />
+          </Link>
+        </div>
+      </div>
+      <div className="justify-start text-white text-3xl font-medium font-['Space_Grotesk'] leading-loose">
+        MockFedCM
       </div>
     </div>
-    <div className="justify-start text-white text-3xl font-medium font-['Space_Grotesk'] leading-loose">
-      MockFedCM
-    </div>
-  </div>
   );
 
   return (
@@ -122,9 +126,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             rightContent={rightSideContent}
           />
           <main className="mx-auto px-4">
-            <div className="px-1">
-              {children}
-            </div>
+            <div className="px-1">{children}</div>
           </main>
         </div>
       </body>
