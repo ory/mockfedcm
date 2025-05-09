@@ -78,7 +78,9 @@ const ExplanationSection = () => {
                 >
                   <div className="pt-1 flex justify-start items-center gap-4">
                     <div className="w-4 h-4 bg-fuchsia-500 rounded-[999px] inline-flex flex-col justify-center items-center">
-                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">{">"}</div>
+                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">
+                        {">"}
+                      </div>
                     </div>
                   </div>
                   <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
@@ -101,7 +103,9 @@ const ExplanationSection = () => {
                 >
                   <div className="pt-1 flex justify-start items-center gap-4">
                     <div className="w-4 h-4 bg-fuchsia-500 rounded-[999px] inline-flex flex-col justify-center items-center">
-                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">{">"}</div>
+                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">
+                        {">"}
+                      </div>
                     </div>
                   </div>
                   <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
@@ -124,7 +128,9 @@ const ExplanationSection = () => {
                 >
                   <div className="pt-1 flex justify-start items-center gap-4">
                     <div className="w-4 h-4 bg-fuchsia-500 rounded-[999px] inline-flex flex-col justify-center items-center">
-                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">{">"}</div>
+                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">
+                        {">"}
+                      </div>
                     </div>
                   </div>
                   <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
@@ -148,7 +154,9 @@ const ExplanationSection = () => {
                 >
                   <div className="pt-1 flex justify-start items-center gap-4">
                     <div className="w-4 h-4 bg-fuchsia-500 rounded-[999px] inline-flex flex-col justify-center items-center">
-                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">{">"}</div>
+                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">
+                        {">"}
+                      </div>
                     </div>
                   </div>
                   <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
@@ -184,7 +192,9 @@ const ExplanationSection = () => {
                 >
                   <div className="pt-1 flex justify-start items-center gap-4">
                     <div className="w-4 h-4 bg-fuchsia-500 rounded-[999px] inline-flex flex-col justify-center items-center">
-                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">{">"}</div>
+                      <div className="self-stretch text-center justify-start text-white text-xs font-medium font-['Schibsted_Grotesk'] leading-3">
+                        {">"}
+                      </div>
                     </div>
                   </div>
                   <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">

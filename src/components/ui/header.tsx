@@ -20,17 +20,17 @@ const Header = ({
 }: HeaderProps) => {
   return (
     <header
-      className={`w-full px-1 bg-black border-b border-fuchsia-500 inline-flex flex-col justify-start items-center overflow-hidden ${className}`}
+      className={`w-full bg-black px-1  border-b border-fuchsia-500 inline-flex flex-col justify-start items-center overflow-hidden ${className}`}
     >
-      <div className="w-full h-full pl-1 pr-1 bg-black overflow-hidden border-b border-fuchsia-500 flex flex-col justify-start items-center">
-        <div className="w-full max-w-7xl py-4 border-l border-r border-fuchsia-500 flex flex-col justify-start items-start gap-12">
+      <div className="w-full max-w-[1536px] h-full bg-black overflow-hidden border-b border-fuchsia-500 flex flex-col justify-start items-center">
+        <div className="w-full py-4 border-l border-r border-fuchsia-500 flex flex-col justify-start items-start gap-12">
           <div className="self-stretch px-8 flex justify-between items-start">
             <div className="flex-1 flex justify-start items-center gap-12 flex-wrap content-center">
-            {logo}
-            {leftContent}
+              {logo}
+              {leftContent}
             </div>
             <div className="flex-1 flex justify-end items-center gap-4">
-                 {rightContent}
+              {rightContent}
             </div>
           </div>
         </div>

@@ -63,7 +63,7 @@ function EndpointItem({ label, url }: { label: string; url: string }) {
 
 function EndpointsList() {
   const [endpoints, setEndpoints] = useState<{ label: string; url: string }[]>(
-    []
+    [],
   );
 
   useEffect(() => {
@@ -206,8 +206,8 @@ export default function IdPExplanation() {
                       </div>
                       <div className="self-stretch flex flex-col justify-start items-start gap-2">
                         <div className="self-stretch opacity-75 justify-start text-gray-800 text-base font-normal font-['Schibsted_Grotesk'] leading-normal">
-                          When a website uses this IdP via FedCM, you&apos;ll see two
-                          mock accounts to choose from.
+                          When a website uses this IdP via FedCM, you&apos;ll
+                          see two mock accounts to choose from.
                         </div>
                       </div>
                     </div>

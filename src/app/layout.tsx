@@ -54,15 +54,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
           </div>
         </Link>
         <Link
-          href="/rp/action"
-          data-state="Default"
-          className="pt-2 flex justify-center items-center gap-2"
-        >
-          <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none whitespace-nowrap">
-            Test FedCM
-          </div>
-        </Link>
-        <Link
           href="/about"
           data-state="Default"
           className="pt-2 flex justify-center items-center gap-2"
@@ -119,13 +110,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
       className={`${spaceGrotesk.variable} ${schibstedGrotesk.variable}`}
     >
       <body className="bg-white">
-        <div className="flex flex-col">
+        <div className="flex flex-col border-b border-fuchsia-500 ">
           <Header
             logo={logo}
             leftContent={leftSideContent}
             rightContent={rightSideContent}
           />
-          <main className="mx-auto px-4">
+          <main className="">
             <div className="px-1">{children}</div>
           </main>
         </div>

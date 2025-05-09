@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState, Suspense, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { FEDCM_IDP_PREFIX } from '@/utils/fedcmStorage';
+import { useEffect, useState, Suspense, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { FEDCM_IDP_PREFIX } from "@/utils/fedcmStorage";
 
 interface BrandingIcon {
   url: string;
@@ -46,17 +46,17 @@ interface CredentialRequestOptions {
     }>;
     context?: string;
   };
-  mediation?: 'optional' | 'required' | 'silent';
+  mediation?: "optional" | "required" | "silent";
   signal?: AbortSignal;
 }
 
 function RPActionContent() {
   const searchParams = useSearchParams();
-  const idpNames = searchParams.getAll('idp');
-  const globalContext = searchParams.get('context') || 'signin'; // Default to signin if not provided
+  const idpNames = searchParams.getAll("idp");
+  const globalContext = searchParams.get("context") || "signin"; // Default to signin if not provided
 
   const [isFedCMSupported, setIsFedCMSupported] = useState<boolean | null>(
-    null
+    null,
   );
   const [idpConfigs, setIdpConfigs] = useState<FedCMIdpConfig[]>([]);
   const [idpProviderConfigs, setIdpProviderConfigs] = useState<
@@ -67,10 +67,10 @@ function RPActionContent() {
   const [fedCMRequest, setFedCMRequest] =
     useState<CredentialRequestOptions | null>(null);
   const [fedCMResponse, setFedCMResponse] = useState<CredentialType | null>(
-    null
+    null,
   );
   const [decodedTokenClaims, setDecodedTokenClaims] = useState<object | null>(
-    null
+    null,
   );
   const [serializableFedCMResponse, setSerializableFedCMResponse] = useState<
     object | null
@@ -90,9 +90,9 @@ function RPActionContent() {
   // Check if FedCM is supported
   useEffect(() => {
     if (
-      typeof navigator !== 'undefined' &&
+      typeof navigator !== "undefined" &&
       navigator.credentials &&
-      typeof navigator.credentials.get === 'function'
+      typeof navigator.credentials.get === "function"
     ) {
       setIsFedCMSupported(true);
     } else {
@@ -108,7 +108,7 @@ function RPActionContent() {
     }
 
     if (idpNames.length === 0) {
-      setError('No IdP specified in the URL');
+      setError("No IdP specified in the URL");
       setLoading(false);
       configsLoadedRef.current = true;
       return;
@@ -132,7 +132,7 @@ function RPActionContent() {
       });
 
       if (loadedConfigs.length === 0) {
-        setError('No valid IdP configurations found for the specified names');
+        setError("No valid IdP configurations found for the specified names");
         setLoading(false);
         configsLoadedRef.current = true;
         return;
@@ -161,19 +161,19 @@ function RPActionContent() {
       const configPromises = idpConfigs.map(async (idp) => {
         try {
           console.log(
-            `Fetching configuration for ${idp.name} from ${idp.configURL}`
+            `Fetching configuration for ${idp.name} from ${idp.configURL}`,
           );
           const response = await fetch(idp.configURL);
           if (!response.ok) {
             throw new Error(
-              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`
+              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`,
             );
           }
           return { name: idp.name, config: await response.json() };
         } catch (err) {
           console.error(
             `Error fetching IdP configuration for ${idp.name}:`,
-            err
+            err,
           );
           return { name: idp.name, error: err };
         }
@@ -185,7 +185,7 @@ function RPActionContent() {
         let hasError = false;
 
         results.forEach((result) => {
-          if ('config' in result) {
+          if ("config" in result) {
             configsMap[result.name] = result.config;
           } else {
             hasError = true;
@@ -193,12 +193,12 @@ function RPActionContent() {
         });
 
         if (Object.keys(configsMap).length === 0) {
-          setError('Failed to fetch all IdP provider configurations');
+          setError("Failed to fetch all IdP provider configurations");
         } else {
           setIdpProviderConfigs(configsMap);
           if (hasError) {
             console.warn(
-              'Some IdP provider configurations could not be loaded'
+              "Some IdP provider configurations could not be loaded",
             );
           }
         }
@@ -264,25 +264,25 @@ function RPActionContent() {
 
         if (providers.length === 0) {
           setError(
-            'No valid provider configurations available for authentication'
+            "No valid provider configurations available for authentication",
           );
           return;
         }
 
         const requestOptions: CredentialRequestOptions = {
           identity: { providers: providers, context: globalContext },
-          mediation: 'optional',
+          mediation: "optional",
         };
         setFedCMRequest(requestOptions);
 
         try {
-          console.log('Initiating FedCM authentication request...');
+          console.log("Initiating FedCM authentication request...");
           const credential = await navigator.credentials.get(requestOptions);
-          console.log('FedCM authentication request completed successfully');
+          console.log("FedCM authentication request completed successfully");
           setFedCMResponse(credential);
           setIsAuthenticated(true);
         } catch (err: unknown) {
-          console.error('FedCM authentication request failed:', err);
+          console.error("FedCM authentication request failed:", err);
           const errorMessage = `FedCM authentication failed: ${err}`;
           setError(errorMessage);
           setIsAuthenticated(false);
@@ -290,16 +290,16 @@ function RPActionContent() {
           // Check if the error suggests login is required
           if (
             err instanceof Error &&
-            (err.name === 'IdentityCredentialError' ||
-              err.name === 'NetworkError')
+            (err.name === "IdentityCredentialError" ||
+              err.name === "NetworkError")
           ) {
-            console.log('Detected potential login required error:', err.name);
+            console.log("Detected potential login required error:", err.name);
             setIsLoginRequiredError(true);
           }
         }
       } catch (err: unknown) {
         // Catch errors during provider/request preparation
-        console.error('Error preparing authentication request:', err);
+        console.error("Error preparing authentication request:", err);
         setError(`Error preparing authentication: ${err}`);
       } finally {
         // Mark as attempted *after* the attempt finishes
@@ -324,7 +324,7 @@ function RPActionContent() {
 
   // Reset auth attempt ONLY when core configuration changes
   useEffect(() => {
-    console.log('Core config changed, resetting authAttempted.');
+    console.log("Core config changed, resetting authAttempted.");
     setAuthAttempted(false);
     // Optionally clear error when config changes, as the next attempt might succeed
     // setError(null);
@@ -333,7 +333,7 @@ function RPActionContent() {
   // Log the fedCMResponse state, decode token, and create serializable object when it updates
   useEffect(() => {
     if (fedCMResponse) {
-      console.log('fedCMResponse (updated state):', fedCMResponse);
+      console.log("fedCMResponse (updated state):", fedCMResponse);
 
       // Create a plain object for serialization
       const serializableResponse: Record<string, string | undefined | null> = {
@@ -343,32 +343,32 @@ function RPActionContent() {
 
       // Check for properties specific to FederatedCredential
       if (
-        'provider' in fedCMResponse &&
-        typeof fedCMResponse.provider === 'string'
+        "provider" in fedCMResponse &&
+        typeof fedCMResponse.provider === "string"
       ) {
         serializableResponse.provider = fedCMResponse.provider;
       }
-      if ('token' in fedCMResponse && typeof fedCMResponse.token === 'string') {
+      if ("token" in fedCMResponse && typeof fedCMResponse.token === "string") {
         serializableResponse.token = fedCMResponse.token; // Might be truncated in display, full token in claims
 
         // Decode the token
         try {
           const token = fedCMResponse.token;
-          const base64Url = token.split('.')[1];
-          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const base64Url = token.split(".")[1];
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
           const jsonPayload = decodeURIComponent(
             atob(base64)
-              .split('')
+              .split("")
               .map(function (c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
               })
-              .join('')
+              .join(""),
           );
           setDecodedTokenClaims(JSON.parse(jsonPayload));
-          console.log('Decoded JWT Claims:', JSON.parse(jsonPayload));
+          console.log("Decoded JWT Claims:", JSON.parse(jsonPayload));
         } catch (error) {
-          console.error('Failed to decode JWT token:', error);
-          setDecodedTokenClaims({ error: 'Failed to decode token' });
+          console.error("Failed to decode JWT token:", error);
+          setDecodedTokenClaims({ error: "Failed to decode token" });
         }
       } else {
         setDecodedTokenClaims({
@@ -378,12 +378,12 @@ function RPActionContent() {
       }
 
       // Check for properties specific to PasswordCredential (if needed)
-      if ('name' in fedCMResponse && typeof fedCMResponse.name === 'string') {
+      if ("name" in fedCMResponse && typeof fedCMResponse.name === "string") {
         serializableResponse.name = fedCMResponse.name;
       }
       if (
-        'iconURL' in fedCMResponse &&
-        typeof fedCMResponse.iconURL === 'string'
+        "iconURL" in fedCMResponse &&
+        typeof fedCMResponse.iconURL === "string"
       ) {
         serializableResponse.iconURL = fedCMResponse.iconURL;
       }
@@ -398,10 +398,10 @@ function RPActionContent() {
 
   if (!isFedCMSupported) {
     return (
-      <div className='min-h-screen bg-base-200 flex flex-col items-center justify-center p-4'>
-        <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
-          <div className='card-body'>
-            <h2 className='card-title text-error'>FedCM Not Supported</h2>
+      <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center p-4">
+        <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title text-error">FedCM Not Supported</h2>
             <p>
               Your browser does not support the Federated Credential Management
               (FedCM) API. Please use a modern browser that supports this
@@ -420,20 +420,20 @@ function RPActionContent() {
   ) {
     // Find the first provider with a login_url
     const providerWithLogin = Object.values(idpProviderConfigs).find(
-      (config) => config.login_url
+      (config) => config.login_url,
     );
 
     return (
-      <div className='min-h-screen bg-base-200 flex flex-col items-center justify-center p-4'>
-        <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
-          <div className='card-body'>
-            <h2 className='card-title text-warning'>Authentication Required</h2>
+      <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center p-4">
+        <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title text-warning">Authentication Required</h2>
             <p>It seems you need to log in to the identity provider first.</p>
-            <p className='text-sm text-error mt-2'>{error}</p>
-            <div className='card-actions justify-center mt-4'>
+            <p className="text-sm text-error mt-2">{error}</p>
+            <div className="card-actions justify-center mt-4">
               <a
                 href={providerWithLogin?.login_url}
-                className='btn btn-primary'
+                className="btn btn-primary"
               >
                 Log in to Identity Provider
               </a>
@@ -446,13 +446,13 @@ function RPActionContent() {
 
   if (error) {
     return (
-      <div className='min-h-screen bg-base-200 flex flex-col items-center justify-center p-4'>
-        <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
-          <div className='card-body'>
-            <h2 className='card-title text-error'>Error</h2>
+      <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center p-4">
+        <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title text-error">Error</h2>
             <p>{error}</p>
             {idpNames.length === 0 && (
-              <p className='mt-2'>No IdP names specified in the URL</p>
+              <p className="mt-2">No IdP names specified in the URL</p>
             )}
           </div>
         </div>
@@ -461,42 +461,42 @@ function RPActionContent() {
   }
 
   return (
-    <div className='min-h-screen bg-base-200 p-4'>
-      <div className='max-w-5xl mx-auto'>
-        <h1 className='text-3xl font-bold mb-6'>FedCM Authentication</h1>
+    <div className="min-h-screen bg-base-200 p-4">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">FedCM Authentication</h1>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left Column: Status Card */}
-          <div className='card bg-base-100 shadow-xl self-start'>
-            <div className='card-body'>
-              <h2 className='card-title'>Authentication Status</h2>
-              <div className='mt-4'>
-                <div className='flex items-center'>
+          <div className="card bg-base-100 shadow-xl self-start">
+            <div className="card-body">
+              <h2 className="card-title">Authentication Status</h2>
+              <div className="mt-4">
+                <div className="flex items-center">
                   <div
                     className={`badge ${
-                      isAuthenticated ? 'badge-success' : 'badge-warning'
+                      isAuthenticated ? "badge-success" : "badge-warning"
                     } mr-2`}
                   >
-                    {isAuthenticated ? 'Authenticated' : 'Pending'}
+                    {isAuthenticated ? "Authenticated" : "Pending"}
                   </div>
                   <span>
                     {isAuthenticated
-                      ? 'Successfully authenticated'
-                      : 'Authentication in progress'}
+                      ? "Successfully authenticated"
+                      : "Authentication in progress"}
                   </span>
                 </div>
               </div>
 
               {isAuthenticated && decodedTokenClaims && (
-                <div className='mt-4'>
-                  <h3 className='font-semibold text-lg mb-2'>
+                <div className="mt-4">
+                  <h3 className="font-semibold text-lg mb-2">
                     User Details (Decoded Token)
                   </h3>
-                  <div className='bg-base-200 p-3 rounded-lg'>
-                    <pre className='overflow-x-auto text-sm'>
+                  <div className="bg-base-200 p-3 rounded-lg">
+                    <pre className="overflow-x-auto text-sm">
                       {decodedTokenClaims
                         ? JSON.stringify(decodedTokenClaims, null, 2)
-                        : 'Decoding token or no token received...'}
+                        : "Decoding token or no token received..."}
                     </pre>
                   </div>
                 </div>
@@ -505,13 +505,13 @@ function RPActionContent() {
           </div>
 
           {/* Right Column: Configuration Cards */}
-          <div className='flex flex-col gap-6'>
+          <div className="flex flex-col gap-6">
             {/* IdP Configurations Card */}
-            <div className='card bg-base-100 shadow-xl'>
-              <div className='card-body'>
-                <h2 className='card-title'>IdP Configurations</h2>
-                <div className='overflow-x-auto'>
-                  <table className='table table-zebra'>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">IdP Configurations</h2>
+                <div className="overflow-x-auto">
+                  <table className="table table-zebra">
                     <thead>
                       <tr>
                         <th>Name</th>
@@ -521,18 +521,18 @@ function RPActionContent() {
                     <tbody>
                       {idpConfigs.map((idp, index) => (
                         <tr key={index}>
-                          <td className='font-medium'>{idp.name}</td>
+                          <td className="font-medium">{idp.name}</td>
                           <td>
                             <div
                               className={`badge ${
                                 idpProviderConfigs[idp.name]
-                                  ? 'badge-success'
-                                  : 'badge-error'
+                                  ? "badge-success"
+                                  : "badge-error"
                               }`}
                             >
                               {idpProviderConfigs[idp.name]
-                                ? 'Loaded'
-                                : 'Failed'}
+                                ? "Loaded"
+                                : "Failed"}
                             </div>
                           </td>
                         </tr>
@@ -545,11 +545,11 @@ function RPActionContent() {
             </div>
 
             {/* Global Context Card */}
-            <div className='card bg-base-100 shadow-xl'>
-              <div className='card-body'>
-                <h2 className='card-title'>Global Settings</h2>
-                <div className='overflow-x-auto'>
-                  <table className='table table-zebra'>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">Global Settings</h2>
+                <div className="overflow-x-auto">
+                  <table className="table table-zebra">
                     <thead>
                       <tr>
                         <th>Setting</th>
@@ -558,9 +558,9 @@ function RPActionContent() {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className='font-medium'>Context</td>
+                        <td className="font-medium">Context</td>
                         <td>
-                          <div className='badge badge-info'>
+                          <div className="badge badge-info">
                             {globalContext}
                           </div>
                         </td>
@@ -574,47 +574,47 @@ function RPActionContent() {
         </div>
 
         {/* Technical Details Section */}
-        <div className='mt-6'>
-          <h2 className='text-2xl font-bold mb-4'>Technical Details</h2>
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold mb-4">Technical Details</h2>
 
-          <div className='grid grid-cols-1 gap-6'>
+          <div className="grid grid-cols-1 gap-6">
             {/* FedCM Request */}
-            <div className='card bg-base-100 shadow-xl'>
-              <div className='card-body'>
-                <h3 className='card-title'>FedCM Request</h3>
-                <div className='bg-base-200 p-4 rounded-lg'>
-                  <pre className='overflow-x-auto text-sm'>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title">FedCM Request</h3>
+                <div className="bg-base-200 p-4 rounded-lg">
+                  <pre className="overflow-x-auto text-sm">
                     {fedCMRequest
                       ? JSON.stringify(fedCMRequest, null, 2)
-                      : 'No request made yet'}
+                      : "No request made yet"}
                   </pre>
                 </div>
               </div>
             </div>
 
             {/* FedCM Response */}
-            <div className='card bg-base-100 shadow-xl'>
-              <div className='card-body'>
-                <h3 className='card-title'>FedCM Response</h3>
-                <div className='bg-base-200 p-4 rounded-lg'>
-                  <pre className='overflow-x-auto text-sm'>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title">FedCM Response</h3>
+                <div className="bg-base-200 p-4 rounded-lg">
+                  <pre className="overflow-x-auto text-sm">
                     {serializableFedCMResponse
                       ? JSON.stringify(serializableFedCMResponse, null, 2)
-                      : 'No response received yet'}
+                      : "No response received yet"}
                   </pre>
                 </div>
               </div>
             </div>
 
             {/* IdP Configurations */}
-            <div className='card bg-base-100 shadow-xl'>
-              <div className='card-body'>
-                <h3 className='card-title'>Loaded IdP Configurations</h3>
-                <div className='bg-base-200 p-4 rounded-lg'>
-                  <pre className='overflow-x-auto text-sm'>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title">Loaded IdP Configurations</h3>
+                <div className="bg-base-200 p-4 rounded-lg">
+                  <pre className="overflow-x-auto text-sm">
                     {idpConfigs.length > 0
                       ? JSON.stringify(idpConfigs, null, 2)
-                      : 'No configurations loaded'}
+                      : "No configurations loaded"}
                   </pre>
                 </div>
               </div>
@@ -630,11 +630,11 @@ export default function RPAction() {
   return (
     <Suspense
       fallback={
-        <div className='min-h-screen bg-base-200 flex flex-col items-center justify-center p-4'>
-          <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
-            <div className='card-body items-center text-center'>
-              <span className='loading loading-spinner loading-lg text-primary'></span>
-              <h2 className='card-title mt-4'>Loading...</h2>
+        <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center p-4">
+          <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+            <div className="card-body items-center text-center">
+              <span className="loading loading-spinner loading-lg text-primary"></span>
+              <h2 className="card-title mt-4">Loading...</h2>
             </div>
           </div>
         </div>
