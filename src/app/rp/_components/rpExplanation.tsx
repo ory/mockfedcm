@@ -1,3 +1,5 @@
+"use client";
+
 import React, { Fragment } from "react";
 import { FedCMContext } from "./contextSelect";
 
@@ -8,7 +10,7 @@ interface ContextOptionWithKey {
   description: string;
 }
 
-const ExplanationSection = () => {
+const ExplanationSection: React.FC = () => {
   const contextOptions: ContextOptionWithKey[] = [
     {
       id: "context-continue",
@@ -41,7 +43,7 @@ const ExplanationSection = () => {
       <div className="max-w-4xl">
         <div className="card">
           <div className="card-body gap-16">
-            <div className="self-stretch h-40 px-8 pb-12 border-b border-gray-300 inline-flex flex-col justify-start items-start gap-4">
+            <div className="self-stretch px-8 pb-12 border-b border-gray-300 inline-flex flex-col justify-start items-start gap-4">
               <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
                 What is this?
               </div>
@@ -61,7 +63,7 @@ const ExplanationSection = () => {
               </div>
             </div>
 
-            <div className="self-stretch px-8 pb-12 border-b border-gray-300 inline-flex flex-col justify-start items-start gap-4">
+            <div className="self-stretch px-8 pb-12 inline-flex flex-col justify-start items-start gap-4">
               <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
                 Configuration Parameters
               </div>
