@@ -27,11 +27,6 @@ export default function Home() {
                           <div className="justify-start text-gray-900 text-sm md:text-base font-medium font-['Space_Grotesk'] leading-none">
                             Setup FedCM Relying Party (RP)
                           </div>
-                          <div className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-300 rounded flex justify-center items-center gap-2">
-                            <div className="justify-start text-cyan-950 text-xs md:text-sm font-normal leading-none tracking-tight">
-                              Not setup
-                            </div>
-                          </div>
                         </div>
                         <div className="self-stretch flex flex-col justify-center items-center gap-2">
                           <div className="self-stretch opacity-75 justify-start text-gray-900 text-sm md:text-base font-normal font-['Schibsted_Grotesk'] leading-normal">
@@ -49,11 +44,6 @@ export default function Home() {
                         <div className="self-stretch inline-flex justify-start items-center gap-2 flex-wrap content-center">
                           <div className="justify-start text-gray-900 text-sm md:text-base font-medium font-['Space_Grotesk'] leading-none">
                             Setup FedCM Identity Provider (IdP)
-                          </div>
-                          <div className="px-2 md:px-3 py-1 md:py-1.5 bg-gray-300 rounded flex justify-center items-center gap-2">
-                            <div className="justify-start text-cyan-950 text-xs md:text-sm font-normal leading-none tracking-tight">
-                              Not setup
-                            </div>
                           </div>
                         </div>
                         <div className="self-stretch flex flex-col justify-center items-center gap-2">

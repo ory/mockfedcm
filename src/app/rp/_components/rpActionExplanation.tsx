@@ -383,7 +383,7 @@ export default function RPActionExplanation() {
           <div
             data-hasp2="false"
             data-hasp3="false"
-            className="self-stretch px-4 pt-4 pb-6 bg-cyan-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-cyan-500 flex flex-col justify-start items-start gap-3"
+            className="self-stretch px-4 pt-4 pb-6 bg-cyan-50 rounded-lg outline outline-offset-[-1px] outline-cyan-500 flex flex-col justify-start items-start gap-3"
           >
             <div className="self-stretch flex flex-col justify-start items-start gap-2">
               <div className="self-stretch inline-flex justify-start items-center gap-2">
@@ -391,7 +391,7 @@ export default function RPActionExplanation() {
                   data-status="Info"
                   className="px-3 py-1.5 bg-cyan-400 rounded flex justify-center items-center gap-2.5"
                 >
-                  <div className="justify-start text-cyan-950 text-sm font-normal font-['Inter'] leading-none tracking-tight">
+                  <div className="justify-start text-cyan-950 text-sm font-normal leading-none tracking-tight">
                     Info
                   </div>
                 </div>
