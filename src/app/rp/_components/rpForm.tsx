@@ -9,6 +9,7 @@ import { generateNonce } from "@/utils/generateNonce";
 import { generateClientId } from "@/utils/generateClientId";
 import { isHttpsEnabled } from "@/utils/https";
 import { useRouter } from "next/navigation";
+import { Copy } from "lucide-react";
 
 // Constants moved to separate object for better reusability
 const STORAGE_KEYS = {
@@ -278,7 +279,7 @@ const JsonOutputDisplay: React.FC<JsonOutputDisplayProps> = ({
         </div>
         <div data-state="Default" className="w-5 h-5 relative">
           <div className="w-5 h-5 left-0 top-0 absolute overflow-hidden">
-            <div className="w-3.5 h-3.5 left-[3.33px] top-[3.33px] absolute outline outline-offset-[-0.50px] outline-fuchsia-500" />
+            <Copy className="w-3.5 h-3.5 left-[3.33px] top-[3.33px] text-fuchsia-500" />
           </div>
         </div>
       </div>

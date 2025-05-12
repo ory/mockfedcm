@@ -30,7 +30,7 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  const logoSrc = "/logo-ory.svg";
+  const logoSrc = "/Generic-Logo.svg";
 
   const leftSideContent = (
     <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-2">
@@ -54,7 +54,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           </div>
         </Link>
         <Link
-          href="/about"
+          href="/"
           data-state="Default"
           className="pt-2 flex justify-center items-center gap-2"
         >
@@ -85,20 +85,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
       data-variant="Default"
       className="flex justify-start items-center gap-4"
     >
-      <div className="w-[42px] h-[42px] relative bg-white rounded-[3.5px]">
-        <div className="w-8 h-8 absolute left-[5px] top-[5px] bg-indigo-500">
-          <Link href="/" className="flex items-center">
-            <Image
-              src={logoSrc}
-              alt={"Company Logo"}
-              width={40}
-              height={40}
-              className="object-contain pt-2 px-1"
-            />
-          </Link>
-        </div>
+      <div className="w-10 h-10 relative bg-white rounded">
+        <Link href="/" className="flex items-center absolute w-10 h-10">
+          <Image
+            src={logoSrc}
+            alt={"Company Logo"}
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+        </Link>
       </div>
-      <div className="justify-start text-white text-3xl font-medium font-['Space_Grotesk'] leading-loose">
+      <div className="hidden md:block justify-start text-white text-3xl font-medium font-['Space_Grotesk'] leading-loose ">
         MockFedCM
       </div>
     </div>
@@ -116,7 +114,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             leftContent={leftSideContent}
             rightContent={rightSideContent}
           />
-          <main className="">
+          <main>
             <div className="px-1">{children}</div>
           </main>
         </div>

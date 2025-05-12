@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { FedCMContext } from "./contextSelect";
 
 interface ContextOptionWithKey {
@@ -37,9 +37,9 @@ const ExplanationSection = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="max-w-4xl">
-        <div className="card mb-8">
+        <div className="card">
           <div className="card-body gap-16">
             <div className="self-stretch h-40 px-8 pb-12 border-b border-gray-300 inline-flex flex-col justify-start items-start gap-4">
               <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
@@ -171,7 +171,7 @@ const ExplanationSection = () => {
                       </div>
                       <div className="self-stretch opacity-75 justify-start">
                         {contextOptions.map((option) => (
-                          <>
+                          <Fragment key={option.id}>
                             <span className="text-gray-800 text-base font-semibold font-['Schibsted_Grotesk'] leading-normal">
                               {option.label}
                             </span>
@@ -179,7 +179,7 @@ const ExplanationSection = () => {
                               : {option.description}
                               <br />
                             </span>
-                          </>
+                          </Fragment>
                         ))}
                       </div>
                     </div>

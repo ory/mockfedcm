@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 
 interface LoginFormData {
   email: string;
@@ -13,6 +14,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const logoSrc = "/Vector.svg";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +55,13 @@ export default function LoginForm() {
       <div className="w-96 px-8 pt-8 pb-16 bg-white rounded-lg shadow-xl outline outline-2 outline-offset-[-2px] outline-fuchsia-300 flex flex-col justify-start items-center gap-11">
         <div className="flex flex-col justify-start items-center gap-3">
           <div className="p-1.5 bg-gradient-to-br from-fuchsia-500/20 to-pink-200/20 rounded-md outline outline-[0.72px] outline-offset-[-0.72px] outline-fuchsia-300 inline-flex justify-start items-center gap-1.5">
-            <div className="w-9 h-9 bg-indigo-600" />
+            <Image
+              src={logoSrc}
+              alt={"Company Logo"}
+              width={40}
+              height={40}
+              className="object-contain"
+            />
           </div>
           <div className="justify-start text-gray-900 text-base font-medium leading-none">
             Sign in to Mock-IdP

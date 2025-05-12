@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import Button from "@/components/ui/button";
+import { Check, Copy } from "lucide-react";
 
 function EndpointItem({ label, url }: { label: string; url: string }) {
   const [copied, setCopied] = useState(false);
@@ -27,7 +27,7 @@ function EndpointItem({ label, url }: { label: string; url: string }) {
           {label}
         </div>
       </div>
-      <div className="self-stretch p-3 bg-white rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
+      <div className="self-stretch p-3 bg-white rounded outline outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
         <div className="flex-1 flex justify-start items-center">
           <div className="flex-1 justify-start text-gray-900 text-base font-normal leading-none">
             {url}
@@ -39,21 +39,9 @@ function EndpointItem({ label, url }: { label: string; url: string }) {
           title={copied ? "Copied!" : "Copy to clipboard"}
         >
           {copied ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
+            <Check className="w-4 h-4 items-center" />
           ) : (
-            <div className="w-2.5 h-2.5 left-[2.67px] top-[2.67px] absolute outline outline-1 outline-offset-[-0.50px] outline-gray-900" />
+            <Copy className="w-4 h-4 items-center" />
           )}
         </div>
       </div>
