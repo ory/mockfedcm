@@ -9,7 +9,7 @@ import { generateNonce } from "@/utils/generateNonce";
 import { generateClientId } from "@/utils/generateClientId";
 import { isHttpsEnabled } from "@/utils/https";
 import { useRouter } from "next/navigation";
-import { Copy } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 
 // Constants moved to separate object for better reusability
 const STORAGE_KEYS = {
@@ -257,6 +257,8 @@ interface JsonOutputDisplayProps {
   countdown: number | null;
   handleTest: () => void;
   handleCancelTest: () => void;
+  handleCopy: () => void;
+  copied: boolean;
 }
 
 // Separate component for JSON output display
@@ -265,8 +267,10 @@ const JsonOutputDisplay: React.FC<JsonOutputDisplayProps> = ({
   countdown,
   handleTest,
   handleCancelTest,
+  handleCopy,
+  copied,
 }) => (
-  <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-fuchsia-500 inline-flex flex-col justify-start items-center gap-11">
+  <div className="self-stretch p-8 mt-2 bg-white rounded-lg outline outline-offset-[-1px] outline-fuchsia-500 inline-flex flex-col justify-start items-center gap-11">
     <div className="self-stretch inline-flex justify-center items-center gap-2">
       <div className="flex-1 justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
         Generated Configuration
@@ -279,7 +283,17 @@ const JsonOutputDisplay: React.FC<JsonOutputDisplayProps> = ({
         </div>
         <div data-state="Default" className="w-5 h-5 relative">
           <div className="w-5 h-5 left-0 top-0 absolute overflow-hidden">
-            <Copy className="w-3.5 h-3.5 left-[3.33px] top-[3.33px] text-fuchsia-500" />
+            <div
+              className="w-4 h-4 relative overflow-hidden cursor-pointer"
+              onClick={handleCopy}
+              title={copied ? "Copied!" : "Copy to clipboard"}
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 left-[3.33px] top-[3.33px] text-fuchsia-500" />
+              ) : (
+                <Copy className="w-3.5 h-3.5 left-[3.33px] top-[3.33px] text-fuchsia-500" />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -433,6 +447,13 @@ const FedCMRPForm: React.FC = () => {
   const [autoTest, setAutoTest] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [testTimerId, setTestTimerId] = useState<NodeJS.Timeout | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(jsonOutput);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const {
     saveIdpToLocalStorage,
@@ -440,6 +461,42 @@ const FedCMRPForm: React.FC = () => {
     removeIdpFromLocalStorage,
     loadConfigurationsFromLocalStorage,
   } = useFedCMStorage();
+
+  // Memoized validation function to improve performance
+  const validateIdps = useMemo((): FedCMConfig[] => {
+    return idps.filter(
+      (idp) => idp.name && idp.configURL && idp.clientId && idp.nonce,
+    );
+  }, [idps]);
+
+  const handleTest = useCallback((): void => {
+    const validIdps = validateIdps;
+
+    if (validIdps.length === 0) {
+      alert("Please fill out at least one complete IdP configuration");
+      return;
+    }
+
+    // Save all valid IdPs to localStorage before testing
+    validIdps.forEach((idp) => saveIdpToLocalStorage(idp));
+    saveGlobalContext(globalContext);
+
+    // Build query parameters with just the IdP names and global context
+    const params = new URLSearchParams();
+    validIdps.forEach((idp) => {
+      params.append("idp", idp.name);
+    });
+    params.append("context", globalContext);
+
+    // Navigate to the test URL
+    router.push(`/rp/action?${params.toString()}`);
+  }, [
+    validateIdps,
+    globalContext,
+    router,
+    saveIdpToLocalStorage,
+    saveGlobalContext,
+  ]);
 
   // Load configurations on initial render
   useEffect(() => {
@@ -475,7 +532,7 @@ const FedCMRPForm: React.FC = () => {
       handleTest();
       setCountdown(null);
     }
-  }, [countdown]);
+  }, [countdown, handleTest]);
 
   // Clean up timer on unmount
   useEffect(() => {
@@ -536,42 +593,6 @@ const FedCMRPForm: React.FC = () => {
     },
     [idps, removeIdpFromLocalStorage],
   );
-
-  // Memoized validation function to improve performance
-  const validateIdps = useMemo((): FedCMConfig[] => {
-    return idps.filter(
-      (idp) => idp.name && idp.configURL && idp.clientId && idp.nonce,
-    );
-  }, [idps]);
-
-  const handleTest = useCallback((): void => {
-    const validIdps = validateIdps;
-
-    if (validIdps.length === 0) {
-      alert("Please fill out at least one complete IdP configuration");
-      return;
-    }
-
-    // Save all valid IdPs to localStorage before testing
-    validIdps.forEach((idp) => saveIdpToLocalStorage(idp));
-    saveGlobalContext(globalContext);
-
-    // Build query parameters with just the IdP names and global context
-    const params = new URLSearchParams();
-    validIdps.forEach((idp) => {
-      params.append("idp", idp.name);
-    });
-    params.append("context", globalContext);
-
-    // Navigate to the test URL
-    router.push(`/rp/action?${params.toString()}`);
-  }, [
-    validateIdps,
-    globalContext,
-    router,
-    saveIdpToLocalStorage,
-    saveGlobalContext,
-  ]);
 
   const handleCancelTest = useCallback((): void => {
     setCountdown(null);
@@ -692,10 +713,12 @@ const FedCMRPForm: React.FC = () => {
   }, [idps]);
 
   return (
-    <div className="w-full">
+    <div className="w-full lg:py-32">
       <div className="card w-full max-w-2xl bg-base-100">
         <div className="card-body">
-          <h2 className="card-title mb-6">FedCM Configuration</h2>
+          <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7 card-title mb-6">
+            FedCM Configuration
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="p-4 border rounded-lg">
@@ -767,6 +790,8 @@ const FedCMRPForm: React.FC = () => {
               countdown={countdown}
               handleTest={handleTest}
               handleCancelTest={handleCancelTest}
+              handleCopy={handleCopy}
+              copied={copied}
             />
           )}
         </div>

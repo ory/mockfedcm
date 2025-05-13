@@ -108,11 +108,11 @@ function EndpointsList() {
 export default function IdPExplanation() {
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <div className="card mb-8">
             <div className="card-body gap-16">
-              <div className="self-stretch px-8 pb-12 border-b border-gray-300 inline-flex flex-col justify-start items-start gap-4">
+              <div className="self-stretch h-full px-8 pb-12 border-b border-gray-300 inline-flex flex-col justify-start items-start gap-4">
                 <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
                   What is this?
                 </div>

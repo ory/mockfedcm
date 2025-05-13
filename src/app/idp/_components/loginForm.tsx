@@ -51,10 +51,10 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="py-32 flex justify-center items-center w-full">
-      <div className="w-96 px-8 pt-8 pb-16 bg-white rounded-lg shadow-xl outline outline-2 outline-offset-[-2px] outline-fuchsia-300 flex flex-col justify-start items-center gap-11">
+    <div className="lg:py-32 py-12 flex justify-center items-center w-full">
+      <div className="w-96 px-8 pt-8 pb-16 bg-white rounded-lg shadow-xl outline outline-offset-[-2px] outline-fuchsia-300 flex flex-col justify-start items-center gap-11">
         <div className="flex flex-col justify-start items-center gap-3">
-          <div className="p-1.5 bg-gradient-to-br from-fuchsia-500/20 to-pink-200/20 rounded-md outline outline-[0.72px] outline-offset-[-0.72px] outline-fuchsia-300 inline-flex justify-start items-center gap-1.5">
+          <div className="p-1.5 bg-gradient-to-br from-fuchsia-500/20 to-pink-200/20 rounded-md outline outline-offset-[-0.72px] outline-fuchsia-300 inline-flex justify-start items-center gap-1.5">
             <Image
               src={logoSrc}
               alt={"Company Logo"}
@@ -91,7 +91,7 @@ export default function LoginForm() {
                   Email
                 </div>
               </div>
-              <div className="self-stretch p-3 bg-white rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
+              <div className="self-stretch p-3 bg-white rounded outline outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
                 <input
                   type="email"
                   value={formData.email}
@@ -111,7 +111,7 @@ export default function LoginForm() {
                   Password
                 </div>
               </div>
-              <div className="self-stretch p-3 bg-white rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
+              <div className="self-stretch p-3 bg-white rounded outline outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
                 <input
                   type="password"
                   value={formData.password}

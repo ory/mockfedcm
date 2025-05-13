@@ -5,17 +5,17 @@ import { ArrowRight } from "lucide-react";
 export default function Home() {
   return (
     <>
-      <div className="w-full bg-white inline-flex flex-col justify-start items-center overflow-hidden">
-        <div className="w-full max-w-[1536px] border-l border-r border-gray-300 flex flex-col justify-start items-start gap-12 overflow-hidden">
+      <div className="w-full h-screen bg-white inline-flex flex-col justify-start items-center overflow-hidden">
+        <div className="w-full h-full max-w-[1536px] border-l border-r border-gray-300 flex flex-col justify-start items-start lg:gap-12 overflow-hidden">
           <div className="self-stretch md:hidden px-4 py-8 bg-gray-50 border-b border-gray-300 flex flex-col justify-start items-start gap-4">
             <div className="self-stretch justify-start text-gray-900 text-2xl font-medium font-['Space_Grotesk'] leading-8">
               Welcome to MockFedCM
             </div>
           </div>
 
-          <div className="self-stretch inline-flex flex-col md:flex-row justify-start items-start w-full">
-            <div className="w-full md:flex-1 md:order-2 px-4 md:px-8 inline-flex flex-col justify-start items-center gap-8 border-b md:border-b-0 md:border-l border-gray-300">
-              <div className="self-stretch py-8 md:py-32 flex flex-col justify-center items-start gap-8">
+          <div className="self-stretch flex-1 inline-flex flex-col md:flex-row justify-start items-start w-full h-full">
+            <div className="w-full h-full md:flex-1 md:order-2 px-4 md:px-8 inline-flex flex-col justify-start items-center gap-8 border-b md:border-b-0 border-l lg:border-l-0 border-gray-300">
+              <div className="self-stretch h-full py-12 md:py-32 flex flex-col justify-start items-start gap-8">
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   <div className="self-stretch flex flex-col justify-start items-start gap-4">
                     <Link
@@ -59,8 +59,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="w-full md:flex-1 md:order-1 py-8 md:py-32 bg-gray-50 inline-flex flex-col justify-start items-center gap-4 border border-gray-300">
-              <div className="hidden md:flex self-stretch flex-col justify-start items-start gap-16">
+            <div className="w-full h-full md:flex-1 md:order-1 py-8 md:py-32 bg-gray-50 inline-flex flex-col justify-start items-center gap-4 border border-gray-300">
+              <div className="hidden md:flex self-stretch h-full flex-col justify-start items-start gap-16">
                 <div className="self-stretch px-8 pb-12 border-b border-gray-300 flex flex-col justify-start items-start gap-4">
                   <div className="self-stretch justify-start text-gray-900 text-3xl font-medium font-['Space_Grotesk'] leading-10">
                     Welcome to MockFedCM
@@ -138,7 +138,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="md:hidden self-stretch flex flex-col justify-start items-start gap-8">
+              <div className="md:hidden self-stretch h-full flex flex-col justify-start items-start gap-8">
                 <div className="self-stretch px-4 pb-8 border-b border-gray-300 flex flex-col justify-start items-start gap-4">
                   <div className="self-stretch justify-start text-gray-900 text-xl font-normal font-['Space_Grotesk'] leading-6">
                     What is this?
