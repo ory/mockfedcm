@@ -86,7 +86,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
       className="flex justify-start items-center gap-4"
     >
       <div className="w-10 h-10 relative bg-white rounded">
-        <Link href="https://github.com/ory/mockfedcm" className="flex items-center absolute w-10 h-10">
+        <Link
+          href="https://github.com/ory/mockfedcm"
+          className="flex items-center absolute w-10 h-10"
+        >
           <Image
             src={logoSrc}
             alt={"Company Logo"}

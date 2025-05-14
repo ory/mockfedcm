@@ -29,7 +29,9 @@ function SelectInput<T extends string | number | readonly string[]>({
     <div className="form-control w-full">
       {label && (
         <label className="label">
-          <span className="label-text font-medium text-gray-900 text-sm font-['Schibsted_Grotesk'] leading-tight">{label}</span>
+          <span className="label-text font-medium text-gray-900 text-sm font-['Schibsted_Grotesk'] leading-tight">
+            {label}
+          </span>
         </label>
       )}
       <select

@@ -9,7 +9,8 @@ import { generateNonce } from "@/utils/generateNonce";
 import { generateClientId } from "@/utils/generateClientId";
 import { isHttpsEnabled } from "@/utils/https";
 import { useRouter } from "next/navigation";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Plus, Save, Trash2, Webhook } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 
 // Constants moved to separate object for better reusability
 const STORAGE_KEYS = {
@@ -43,7 +44,7 @@ interface IdPConfigCardProps {
   updateIdpConfig: (
     index: number,
     key: keyof FedCMConfig,
-    value: string | boolean
+    value: string | boolean,
   ) => void;
   handleGenerateNewNonce: (index: number) => void;
   saveIdp: (index: number) => void;
@@ -111,7 +112,7 @@ const IdPConfigCard: React.FC<IdPConfigCardProps> = ({
             className="join-item bg-white border-0"
             title="Regenerate nonce"
           >
-            <RefreshIcon />
+            <RefreshCcw size={20} strokeWidth={1.5} />
           </Button>
         </div>
       </div>
@@ -138,10 +139,10 @@ const IdPConfigCard: React.FC<IdPConfigCardProps> = ({
         onClick={() => saveIdp(index)}
         variant="ghost"
         size="sm"
-        className="text-primary"
+        className="text-primary bg-subtle"
         title="Save this IdP configuration"
       >
-        <SaveIcon />
+        <Save size={20} strokeWidth={1.5} />
         Save
       </Button>
 
@@ -154,107 +155,12 @@ const IdPConfigCard: React.FC<IdPConfigCardProps> = ({
           className="text-error"
           title="Remove this IdP"
         >
-          <TrashIcon />
+          <Trash2 />
           Remove
         </Button>
       )}
     </div>
   </div>
-);
-
-// Extract icons as separate components for reusability
-const RefreshIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-    <path d="M21 3v5h-5" />
-    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-    <path d="M8 16H3v5" />
-  </svg>
-);
-
-const SaveIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="mr-1"
-  >
-    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-    <polyline points="7 3 7 8 15 8"></polyline>
-  </svg>
-);
-
-const TrashIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="mr-1"
-  >
-    <path d="M3 6h18"></path>
-    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-  </svg>
-);
-
-const PlusIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M12 5v14"></path>
-    <path d="M5 12h14"></path>
-  </svg>
-);
-
-const WebhookIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="lucide lucide-webhook"
-  >
-    <path d="M18 16.98h-5.91a4 4 0 0 1-7.76-.81l-.3-1.68a4 4 0 0 1 .52-3.9l1.34-1.6A4 4 0 0 1 9.04 7c.52 0 1 .11 1.46.32l1.04.5a4 4 0 0 1 3.58 3.5l.5 1.03A4 4 0 0 1 18 16.98Z" />
-    <path d="M12 7V2l5 5" />
-    <path d="m7 19 5-5" />
-    <path d="m12 14 5 5" />
-  </svg>
 );
 
 interface JsonOutputDisplayProps {
@@ -352,12 +258,12 @@ const useFedCMStorage = () => {
     // Save the IdP configuration
     localStorage.setItem(
       `${STORAGE_KEYS.IDP_PREFIX}${idp.name}`,
-      JSON.stringify(idp)
+      JSON.stringify(idp),
     );
 
     // Update the list of IdP names
     const existingList: string[] = JSON.parse(
-      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]"
+      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]",
     );
     if (!existingList.includes(idp.name)) {
       existingList.push(idp.name);
@@ -373,7 +279,7 @@ const useFedCMStorage = () => {
     localStorage.removeItem(`${STORAGE_KEYS.IDP_PREFIX}${idpName}`);
 
     const idpList: string[] = JSON.parse(
-      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]"
+      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]",
     );
     const updatedList = idpList.filter((name) => name !== idpName);
     localStorage.setItem(STORAGE_KEYS.IDP_LIST, JSON.stringify(updatedList));
@@ -382,7 +288,7 @@ const useFedCMStorage = () => {
   const loadConfigurationsFromLocalStorage = useCallback((): StorageResult => {
     try {
       const idpList: string[] = JSON.parse(
-        localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]"
+        localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]",
       );
 
       if (idpList.length === 0) {
@@ -393,7 +299,7 @@ const useFedCMStorage = () => {
 
       idpList.forEach((idpName) => {
         const idpData = localStorage.getItem(
-          `${STORAGE_KEYS.IDP_PREFIX}${idpName}`
+          `${STORAGE_KEYS.IDP_PREFIX}${idpName}`,
         );
         if (idpData) {
           try {
@@ -406,7 +312,7 @@ const useFedCMStorage = () => {
       });
 
       const savedContext = localStorage.getItem(
-        STORAGE_KEYS.GLOBAL_CONTEXT
+        STORAGE_KEYS.GLOBAL_CONTEXT,
       ) as FedCMContext | null;
 
       return {
@@ -446,7 +352,7 @@ const FedCMRPForm: React.FC = () => {
   const router = useRouter();
   const [idps, setIdps] = useState<FedCMConfig[]>([{ ...DEFAULT_IDP_CONFIG }]);
   const [globalContext, setGlobalContext] = useState<FedCMContext>(
-    FedCMContext.SignIn
+    FedCMContext.SignIn,
   );
   const [jsonOutput, setJsonOutput] = useState<string>("");
   const [autoTest, setAutoTest] = useState<boolean>(false);
@@ -470,7 +376,7 @@ const FedCMRPForm: React.FC = () => {
   // Memoized validation function to improve performance
   const validateIdps = useMemo((): FedCMConfig[] => {
     return idps.filter(
-      (idp) => idp.name && idp.configURL && idp.clientId && idp.nonce
+      (idp) => idp.name && idp.configURL && idp.clientId && idp.nonce,
     );
   }, [idps]);
 
@@ -564,7 +470,7 @@ const FedCMRPForm: React.FC = () => {
         return updatedIdps;
       });
     },
-    []
+    [],
   );
 
   const addNewIdp = useCallback((): void => {
@@ -585,7 +491,7 @@ const FedCMRPForm: React.FC = () => {
       saveIdpToLocalStorage(idp);
       saveGlobalContext(globalContext);
     },
-    [idps, globalContext, saveIdpToLocalStorage, saveGlobalContext]
+    [idps, globalContext, saveIdpToLocalStorage, saveGlobalContext],
   );
 
   const removeIdp = useCallback(
@@ -596,7 +502,7 @@ const FedCMRPForm: React.FC = () => {
         setIdps((prevIdps) => prevIdps.filter((_, i) => i !== index));
       }
     },
-    [idps, removeIdpFromLocalStorage]
+    [idps, removeIdpFromLocalStorage],
   );
 
   const handleCancelTest = useCallback((): void => {
@@ -670,7 +576,7 @@ const FedCMRPForm: React.FC = () => {
       autoTest,
       saveIdpToLocalStorage,
       saveGlobalContext,
-    ]
+    ],
   );
 
   const addMockFedCMIdp = useCallback((): void => {
@@ -748,7 +654,7 @@ const FedCMRPForm: React.FC = () => {
               variant="ghost"
               className="gap-2"
             >
-              <WebhookIcon />
+              <Webhook />
               <span className="text-gray-900 text-sm font-normal font-['Schibsted_Grotesk'] leading-none">
                 Use MockFedCM IdP
               </span>
@@ -776,7 +682,7 @@ const FedCMRPForm: React.FC = () => {
               variant="ghost"
               className="gap-2"
             >
-              <PlusIcon />
+              <Plus size={18} />
               <span className="text-gray-900 text-sm font-normal font-['Schibsted_Grotesk'] leading-none">
                 Add IdP
               </span>
@@ -798,69 +704,6 @@ const FedCMRPForm: React.FC = () => {
           </div>
         </form>
       </div>
-
-      {/* <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="p-4 border rounded-lg">
-              <h3 className="font-medium text-center text-lg mb-4">
-                Global Settings
-              </h3>
-              <ContextSelect
-                value={globalContext}
-                onChange={(value: FedCMContext) => setGlobalContext(value)}
-              />
-            </div>
-
-            Button to add MockFedCM IdP
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                onClick={addMockFedCMIdp}
-                variant="ghost"
-                className="gap-2"
-              >
-                <WebhookIcon />
-                Use MockFedCM IdP
-              </Button>
-            </div>
-
-            IdP configuration cards
-            {idps.map((idp, index) => (
-              <IdPConfigCard
-                key={`idp-${index}`}
-                idp={idp}
-                index={index}
-                updateIdpConfig={updateIdpConfig}
-                handleGenerateNewNonce={handleGenerateNewNonce}
-                saveIdp={saveIdp}
-                removeIdp={removeIdp}
-                canRemove={idps.length > 1}
-              />
-            ))}
-
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                onClick={addNewIdp}
-                variant="ghost"
-                className="gap-2"
-              >
-                <PlusIcon />
-                Add IdP
-              </Button>
-            </div>
-
-            <ToggleInput
-              label="Auto Test (automatically run test after 5 seconds)"
-              checked={autoTest}
-              onChange={(checked: boolean) => setAutoTest(checked)}
-            />
-
-            <div className="card-actions justify-end pt-4">
-              <Button type="submit" variant="primary">
-                Generate Configuration
-              </Button>
-            </div>
-          </form> */}
 
       {/* Display JSON output if available */}
       {jsonOutput && (
