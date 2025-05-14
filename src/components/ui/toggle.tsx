@@ -19,7 +19,7 @@ const ToggleInput = ({
   ...props
 }: ToggleInputProps) => {
   return (
-    <div className="form-control">
+    <div className="self-stretch relative overflow-hidden">
       <label className="label cursor-pointer justify-start gap-2">
         <input
           type="checkbox"

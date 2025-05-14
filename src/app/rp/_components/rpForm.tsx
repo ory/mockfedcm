@@ -43,7 +43,7 @@ interface IdPConfigCardProps {
   updateIdpConfig: (
     index: number,
     key: keyof FedCMConfig,
-    value: string | boolean,
+    value: string | boolean
   ) => void;
   handleGenerateNewNonce: (index: number) => void;
   saveIdp: (index: number) => void;
@@ -61,56 +61,69 @@ const IdPConfigCard: React.FC<IdPConfigCardProps> = ({
   removeIdp,
   canRemove,
 }) => (
-  <div className="p-4 border rounded-lg space-y-6">
-    <h3 className="font-medium text-center text-lg">
-      {idp.name || `FedCM IdP ${index + 1}`}
-    </h3>
+  <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-gray-300 inline-flex flex-col justify-start items-center gap-8">
+    <div className="self-stretch inline-flex flex-col justify-start gap-6">
+      <h3 className="font-medium text-center text-lg">
+        {idp.name || `FedCM IdP ${index + 1}`}
+      </h3>
 
-    <TextInput
-      label="IdP Name"
-      placeholder="Friendly name for this IdP"
-      value={idp.name}
-      onChange={(value) => updateIdpConfig(index, "name", value)}
-      required
-    />
+      <TextInput
+        label="IdP Name"
+        placeholder="Friendly name for this IdP"
+        value={idp.name}
+        onChange={(value) => updateIdpConfig(index, "name", value)}
+        required
+      />
 
-    <TextInput
-      label="Config URL"
-      type="url"
-      placeholder="https://example.com/fedcm.json"
-      value={idp.configURL}
-      onChange={(value) => updateIdpConfig(index, "configURL", value)}
-      required
-    />
+      <TextInput
+        label="Config URL"
+        type="url"
+        placeholder="https://example.com/fedcm.json"
+        value={idp.configURL}
+        onChange={(value) => updateIdpConfig(index, "configURL", value)}
+        required
+      />
 
-    <TextInput
-      label="Client ID"
-      placeholder="your-client-id"
-      value={idp.clientId}
-      onChange={(value) => updateIdpConfig(index, "clientId", value)}
-      required
-    />
+      <TextInput
+        label="Client ID"
+        placeholder="your-client-id"
+        value={idp.clientId}
+        onChange={(value) => updateIdpConfig(index, "clientId", value)}
+        required
+      />
 
-    <div className="space-y-2">
-      <label className="text-sm font-medium">Nonce</label>
-      <div className="join w-full">
-        <input
-          type="text"
-          value={idp.nonce}
-          readOnly
-          className="input input-bordered join-item w-full bg-base-200"
-        />
-        <Button
-          type="button"
-          onClick={() => handleGenerateNewNonce(index)}
-          variant="ghost"
-          size="sm"
-          className="join-item"
-          title="Regenerate nonce"
-        >
-          <RefreshIcon />
-        </Button>
+      <div className="self-stretch inline-flex flex-col justify-start items-start gap-1">
+        <div className="self-stretch inline-flex justify-start items-center gap-8">
+          <label className="text-sm font-medium">Nonce</label>
+        </div>
+        <div className="self-stretch p-3 bg-white rounded outline outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
+          <input
+            type="text"
+            value={idp.nonce}
+            readOnly
+            className="flex-1 justify-start text-gray-900 text-base font-normal font-['Schibsted_Grotesk'] leading-none"
+          />
+          <Button
+            type="button"
+            onClick={() => handleGenerateNewNonce(index)}
+            variant="ghost"
+            size="sm"
+            className="join-item bg-white border-0"
+            title="Regenerate nonce"
+          >
+            <RefreshIcon />
+          </Button>
+        </div>
       </div>
+
+      {idp.useLoginHint && (
+        <TextInput
+          label="Login Hint"
+          placeholder="user@example.com"
+          value={idp.loginHint || ""}
+          onChange={(value) => updateIdpConfig(index, "loginHint", value)}
+        />
+      )}
     </div>
 
     <ToggleInput
@@ -118,14 +131,6 @@ const IdPConfigCard: React.FC<IdPConfigCardProps> = ({
       checked={idp.useLoginHint}
       onChange={(checked) => updateIdpConfig(index, "useLoginHint", checked)}
     />
-
-    {idp.useLoginHint && (
-      <TextInput
-        placeholder="user@example.com"
-        value={idp.loginHint || ""}
-        onChange={(value) => updateIdpConfig(index, "loginHint", value)}
-      />
-    )}
 
     <div className="flex justify-end gap-2 mt-4">
       <Button
@@ -347,12 +352,12 @@ const useFedCMStorage = () => {
     // Save the IdP configuration
     localStorage.setItem(
       `${STORAGE_KEYS.IDP_PREFIX}${idp.name}`,
-      JSON.stringify(idp),
+      JSON.stringify(idp)
     );
 
     // Update the list of IdP names
     const existingList: string[] = JSON.parse(
-      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]",
+      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]"
     );
     if (!existingList.includes(idp.name)) {
       existingList.push(idp.name);
@@ -368,7 +373,7 @@ const useFedCMStorage = () => {
     localStorage.removeItem(`${STORAGE_KEYS.IDP_PREFIX}${idpName}`);
 
     const idpList: string[] = JSON.parse(
-      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]",
+      localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]"
     );
     const updatedList = idpList.filter((name) => name !== idpName);
     localStorage.setItem(STORAGE_KEYS.IDP_LIST, JSON.stringify(updatedList));
@@ -377,7 +382,7 @@ const useFedCMStorage = () => {
   const loadConfigurationsFromLocalStorage = useCallback((): StorageResult => {
     try {
       const idpList: string[] = JSON.parse(
-        localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]",
+        localStorage.getItem(STORAGE_KEYS.IDP_LIST) || "[]"
       );
 
       if (idpList.length === 0) {
@@ -388,7 +393,7 @@ const useFedCMStorage = () => {
 
       idpList.forEach((idpName) => {
         const idpData = localStorage.getItem(
-          `${STORAGE_KEYS.IDP_PREFIX}${idpName}`,
+          `${STORAGE_KEYS.IDP_PREFIX}${idpName}`
         );
         if (idpData) {
           try {
@@ -401,7 +406,7 @@ const useFedCMStorage = () => {
       });
 
       const savedContext = localStorage.getItem(
-        STORAGE_KEYS.GLOBAL_CONTEXT,
+        STORAGE_KEYS.GLOBAL_CONTEXT
       ) as FedCMContext | null;
 
       return {
@@ -441,7 +446,7 @@ const FedCMRPForm: React.FC = () => {
   const router = useRouter();
   const [idps, setIdps] = useState<FedCMConfig[]>([{ ...DEFAULT_IDP_CONFIG }]);
   const [globalContext, setGlobalContext] = useState<FedCMContext>(
-    FedCMContext.SignIn,
+    FedCMContext.SignIn
   );
   const [jsonOutput, setJsonOutput] = useState<string>("");
   const [autoTest, setAutoTest] = useState<boolean>(false);
@@ -465,7 +470,7 @@ const FedCMRPForm: React.FC = () => {
   // Memoized validation function to improve performance
   const validateIdps = useMemo((): FedCMConfig[] => {
     return idps.filter(
-      (idp) => idp.name && idp.configURL && idp.clientId && idp.nonce,
+      (idp) => idp.name && idp.configURL && idp.clientId && idp.nonce
     );
   }, [idps]);
 
@@ -559,7 +564,7 @@ const FedCMRPForm: React.FC = () => {
         return updatedIdps;
       });
     },
-    [],
+    []
   );
 
   const addNewIdp = useCallback((): void => {
@@ -580,7 +585,7 @@ const FedCMRPForm: React.FC = () => {
       saveIdpToLocalStorage(idp);
       saveGlobalContext(globalContext);
     },
-    [idps, globalContext, saveIdpToLocalStorage, saveGlobalContext],
+    [idps, globalContext, saveIdpToLocalStorage, saveGlobalContext]
   );
 
   const removeIdp = useCallback(
@@ -591,7 +596,7 @@ const FedCMRPForm: React.FC = () => {
         setIdps((prevIdps) => prevIdps.filter((_, i) => i !== index));
       }
     },
-    [idps, removeIdpFromLocalStorage],
+    [idps, removeIdpFromLocalStorage]
   );
 
   const handleCancelTest = useCallback((): void => {
@@ -665,7 +670,7 @@ const FedCMRPForm: React.FC = () => {
       autoTest,
       saveIdpToLocalStorage,
       saveGlobalContext,
-    ],
+    ]
   );
 
   const addMockFedCMIdp = useCallback((): void => {
@@ -713,14 +718,88 @@ const FedCMRPForm: React.FC = () => {
   }, [idps]);
 
   return (
-    <div className="w-full lg:py-32">
-      <div className="card w-full max-w-2xl bg-base-100">
-        <div className="card-body">
-          <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7 card-title mb-6">
+    <div className="self-stretch py-32 inline-flex flex-col justify-center items-start gap-16">
+      <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-gray-300 flex flex-col justify-start items-center gap-11">
+        <div className="self-stretch inline-flex justify-center items-center gap-2">
+          <div className="flex-1 justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
             FedCM Configuration
           </div>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="self-stretch flex flex-col justify-start items-start gap-8"
+        >
+          <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-gray-300 inline-flex flex-col justify-start items-center gap-8">
+            <h3 className="font-medium text-center text-lg mb-4 text-gray-900 font-['Schibsted_Grotesk'] leading-tight">
+              Global Settings
+            </h3>
+            <ContextSelect
+              value={globalContext}
+              onChange={(value) => setGlobalContext(value)}
+            />
+          </div>
+
+          {/* Button to add MockFedCM IdP */}
+          <div className="flex justify-center self-stretch">
+            <Button
+              type="button"
+              onClick={addMockFedCMIdp}
+              variant="ghost"
+              className="gap-2"
+            >
+              <WebhookIcon />
+              <span className="text-gray-900 text-sm font-normal font-['Schibsted_Grotesk'] leading-none">
+                Use MockFedCM IdP
+              </span>
+            </Button>
+          </div>
+
+          {/* IdP configuration cards */}
+          {idps.map((idp, index) => (
+            <IdPConfigCard
+              key={`idp-${index}`}
+              idp={idp}
+              index={index}
+              updateIdpConfig={updateIdpConfig}
+              handleGenerateNewNonce={handleGenerateNewNonce}
+              saveIdp={saveIdp}
+              removeIdp={removeIdp}
+              canRemove={idps.length > 1}
+            />
+          ))}
+
+          <div className="flex justify-center self-stretch">
+            <Button
+              type="button"
+              onClick={addNewIdp}
+              variant="ghost"
+              className="gap-2"
+            >
+              <PlusIcon />
+              <span className="text-gray-900 text-sm font-normal font-['Schibsted_Grotesk'] leading-none">
+                Add IdP
+              </span>
+            </Button>
+          </div>
+
+          <ToggleInput
+            label="Auto Test (automatically run test after 5 seconds)"
+            checked={autoTest}
+            onChange={(checked) => setAutoTest(checked)}
+          />
+
+          <div className="self-stretch flex flex-col justify-start items-end gap-3">
+            <Button type="submit" variant="primary">
+              <span className="text-white text-sm font-normal font-['Schibsted_Grotesk'] leading-none">
+                Generate Configuration
+              </span>
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      {/* <form onSubmit={handleSubmit} className="space-y-6">
             <div className="p-4 border rounded-lg">
               <h3 className="font-medium text-center text-lg mb-4">
                 Global Settings
@@ -731,7 +810,7 @@ const FedCMRPForm: React.FC = () => {
               />
             </div>
 
-            {/* Button to add MockFedCM IdP */}
+            Button to add MockFedCM IdP
             <div className="flex justify-center">
               <Button
                 type="button"
@@ -744,7 +823,7 @@ const FedCMRPForm: React.FC = () => {
               </Button>
             </div>
 
-            {/* IdP configuration cards */}
+            IdP configuration cards
             {idps.map((idp, index) => (
               <IdPConfigCard
                 key={`idp-${index}`}
@@ -781,21 +860,19 @@ const FedCMRPForm: React.FC = () => {
                 Generate Configuration
               </Button>
             </div>
-          </form>
+          </form> */}
 
-          {/* Display JSON output if available */}
-          {jsonOutput && (
-            <JsonOutputDisplay
-              jsonOutput={jsonOutput}
-              countdown={countdown}
-              handleTest={handleTest}
-              handleCancelTest={handleCancelTest}
-              handleCopy={handleCopy}
-              copied={copied}
-            />
-          )}
-        </div>
-      </div>
+      {/* Display JSON output if available */}
+      {jsonOutput && (
+        <JsonOutputDisplay
+          jsonOutput={jsonOutput}
+          countdown={countdown}
+          handleTest={handleTest}
+          handleCancelTest={handleCancelTest}
+          handleCopy={handleCopy}
+          copied={copied}
+        />
+      )}
     </div>
   );
 };

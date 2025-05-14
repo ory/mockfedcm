@@ -2,7 +2,7 @@ import React from "react";
 
 export default function RPActionExplanation() {
   return (
-    <div className="self-stretch py-32 bg-gray-50 border-r border-gray-300 inline-flex flex-col justify-start items-center gap-4">
+    <div className="self-stretch py-32 bg-gray-50 border-gray-300 inline-flex flex-col justify-start items-center gap-4">
       <div className="self-stretch flex flex-col justify-start items-start gap-16">
         <div className="self-stretch px-8 pb-12 border-b border-gray-300 flex flex-col justify-start items-start gap-4">
           <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
