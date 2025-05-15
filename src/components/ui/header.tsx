@@ -20,7 +20,7 @@ const Header = ({
 }: HeaderProps) => {
   return (
     <header
-      className={`w-full bg-black px-1 border-b border-fuchsia-500 inline-flex flex-col justify-start items-center overflow-hidden ${className}`}
+      className={`fixed top-0 left-0 right-0 z-50 w-full bg-black px-1 border-b border-fuchsia-500 inline-flex flex-col justify-start items-center overflow-hidden ${className}`}
     >
       <div className="w-full max-w-[1536px] h-full bg-black overflow-hidden flex flex-col justify-start items-center">
         <div className="w-full py-1.5 border-l border-r border-fuchsia-500 flex flex-col justify-start items-start gap-12">

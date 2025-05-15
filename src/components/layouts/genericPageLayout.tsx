@@ -24,7 +24,7 @@ const GenericPageLayout = ({
 }: GenericPageLayoutProps) => {
   return (
     <div
-      className={`w-full lg:h-screen bg-white flex flex-col justify-start items-center overflow-hidden ${className}`}
+      className={`w-full bg-white flex flex-col justify-start items-center overflow-hidden ${className}`}
     >
       <div className="w-full h-full max-w-[1536px] border-l border-r border-gray-300 flex flex-col justify-start items-start lg:gap-12 overflow-y-auto">
         <div className="self-stretch md:hidden px-4 py-8 bg-gray-50 border-b border-gray-300 flex flex-col justify-start items-start gap-4">

@@ -624,7 +624,7 @@ const FedCMRPForm: React.FC = () => {
   }, [idps]);
 
   return (
-    <div className="self-stretch py-32 inline-flex flex-col justify-center items-start gap-16">
+    <div className="self-stretch py-12 lg:py-32 inline-flex flex-col justify-center items-start gap-16">
       <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-gray-300 flex flex-col justify-start items-center gap-11">
         <div className="self-stretch inline-flex justify-center items-center gap-2">
           <div className="flex-1 justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">

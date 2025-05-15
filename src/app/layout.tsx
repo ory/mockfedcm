@@ -111,12 +111,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
       className={`${spaceGrotesk.variable} ${schibstedGrotesk.variable}`}
     >
       <body className="bg-white">
-        <div className="flex flex-col border-b border-fuchsia-500 ">
-          <Header
-            logo={logo}
-            leftContent={leftSideContent}
-            rightContent={rightSideContent}
-          />
+        <Header
+          logo={logo}
+          leftContent={leftSideContent}
+          rightContent={rightSideContent}
+        />
+        <div className="pt-24 lg:pt-18 border-b border-t border-fuchsia-500">
           <main>
             <div className="px-1">{children}</div>
           </main>
