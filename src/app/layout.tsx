@@ -116,7 +116,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           leftContent={leftSideContent}
           rightContent={rightSideContent}
         />
-        <div className="pt-24 lg:pt-18 border-b border-t border-fuchsia-500">
+        <div className="pt-24 lg:pt-18 border-b border-fuchsia-500">
           <main>
             <div className="px-1">{children}</div>
           </main>

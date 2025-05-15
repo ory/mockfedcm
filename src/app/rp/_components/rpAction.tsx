@@ -3,6 +3,8 @@
 import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { FEDCM_IDP_PREFIX } from "@/utils/fedcmStorage";
+import CodeSnippet from "@/components/ui/codeSnippet";
+import StatusTable from "@/components/ui/statusTable";
 
 interface BrandingIcon {
   url: string;
@@ -56,7 +58,7 @@ function RPActionContent() {
   const globalContext = searchParams.get("context") || "signin"; // Default to signin if not provided
 
   const [isFedCMSupported, setIsFedCMSupported] = useState<boolean | null>(
-    null,
+    null
   );
   const [idpConfigs, setIdpConfigs] = useState<FedCMIdpConfig[]>([]);
   const [idpProviderConfigs, setIdpProviderConfigs] = useState<
@@ -67,10 +69,10 @@ function RPActionContent() {
   const [fedCMRequest, setFedCMRequest] =
     useState<CredentialRequestOptions | null>(null);
   const [fedCMResponse, setFedCMResponse] = useState<CredentialType | null>(
-    null,
+    null
   );
   const [decodedTokenClaims, setDecodedTokenClaims] = useState<object | null>(
-    null,
+    null
   );
   const [serializableFedCMResponse, setSerializableFedCMResponse] = useState<
     object | null
@@ -161,19 +163,19 @@ function RPActionContent() {
       const configPromises = idpConfigs.map(async (idp) => {
         try {
           console.log(
-            `Fetching configuration for ${idp.name} from ${idp.configURL}`,
+            `Fetching configuration for ${idp.name} from ${idp.configURL}`
           );
           const response = await fetch(idp.configURL);
           if (!response.ok) {
             throw new Error(
-              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`,
+              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`
             );
           }
           return { name: idp.name, config: await response.json() };
         } catch (err) {
           console.error(
             `Error fetching IdP configuration for ${idp.name}:`,
-            err,
+            err
           );
           return { name: idp.name, error: err };
         }
@@ -198,7 +200,7 @@ function RPActionContent() {
           setIdpProviderConfigs(configsMap);
           if (hasError) {
             console.warn(
-              "Some IdP provider configurations could not be loaded",
+              "Some IdP provider configurations could not be loaded"
             );
           }
         }
@@ -264,7 +266,7 @@ function RPActionContent() {
 
         if (providers.length === 0) {
           setError(
-            "No valid provider configurations available for authentication",
+            "No valid provider configurations available for authentication"
           );
           return;
         }
@@ -362,7 +364,7 @@ function RPActionContent() {
               .map(function (c) {
                 return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
               })
-              .join(""),
+              .join("")
           );
           setDecodedTokenClaims(JSON.parse(jsonPayload));
           console.log("Decoded JWT Claims:", JSON.parse(jsonPayload));
@@ -413,6 +415,19 @@ function RPActionContent() {
     );
   }
 
+  const idpValues: string[][] | undefined = [];
+  const idpColors: string[] | undefined = [];
+
+  idpConfigs.map((idp) => {
+    idpValues.push([
+      idp.name,
+      idpProviderConfigs[idp.name] ? "Loaded" : "Failed",
+    ]);
+    idpColors.push(
+      idpProviderConfigs[idp.name] ? "bg-green-400" : "bg-red-400"
+    );
+  });
+
   if (
     isLoginRequiredError && // Use the new specific state flag
     !isAuthenticated &&
@@ -461,166 +476,88 @@ function RPActionContent() {
   }
 
   return (
-    <div className="min-h-screen bg-base-200 p-4">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">FedCM Authentication</h1>
+    <div className="self-stretch py-32 inline-flex flex-col justify-center items-start gap-16">
+      <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
+        FedCM Authentication
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left Column: Status Card */}
-          <div className="card bg-base-100 shadow-xl self-start">
-            <div className="card-body">
-              <h2 className="card-title">Authentication Status</h2>
-              <div className="mt-4">
-                <div className="flex items-center">
-                  <div
-                    className={`badge ${
-                      isAuthenticated ? "badge-success" : "badge-warning"
-                    } mr-2`}
-                  >
-                    {isAuthenticated ? "Authenticated" : "Pending"}
-                  </div>
-                  <span>
-                    {isAuthenticated
-                      ? "Successfully authenticated"
-                      : "Authentication in progress"}
-                  </span>
-                </div>
-              </div>
-
-              {isAuthenticated && decodedTokenClaims && (
-                <div className="mt-4">
-                  <h3 className="font-semibold text-lg mb-2">
-                    User Details (Decoded Token)
-                  </h3>
-                  <div className="bg-base-200 p-3 rounded-lg">
-                    <pre className="overflow-x-auto text-sm">
-                      {decodedTokenClaims
-                        ? JSON.stringify(decodedTokenClaims, null, 2)
-                        : "Decoding token or no token received..."}
-                    </pre>
-                  </div>
-                </div>
-              )}
-            </div>
+      <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-gray-300 inline-flex flex-col justify-start items-center gap-11">
+        {/* Left Column: Status Card */}
+        <div className="self-stretch inline-flex justify-center items-center gap-2">
+          <div className="flex-1 justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
+            Authentication Status
           </div>
-
-          {/* Right Column: Configuration Cards */}
-          <div className="flex flex-col gap-6">
-            {/* IdP Configurations Card */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">IdP Configurations</h2>
-                <div className="overflow-x-auto">
-                  <table className="table table-zebra">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {idpConfigs.map((idp, index) => (
-                        <tr key={index}>
-                          <td className="font-medium">{idp.name}</td>
-                          <td>
-                            <div
-                              className={`badge ${
-                                idpProviderConfigs[idp.name]
-                                  ? "badge-success"
-                                  : "badge-error"
-                              }`}
-                            >
-                              {idpProviderConfigs[idp.name]
-                                ? "Loaded"
-                                : "Failed"}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Remove global context display from here */}
-              </div>
-            </div>
-
-            {/* Global Context Card */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Global Settings</h2>
-                <div className="overflow-x-auto">
-                  <table className="table table-zebra">
-                    <thead>
-                      <tr>
-                        <th>Setting</th>
-                        <th>Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="font-medium">Context</td>
-                        <td>
-                          <div className="badge badge-info">
-                            {globalContext}
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          <div
+            data-status="Success"
+            className={`px-3 py-1.5 rounded flex justify-center items-center gap-2.5 ${
+              isAuthenticated ? "bg-green-400" : "bg-yellow-400"
+            } mr-2`}
+          >
+            <div className="justify-start text-green-950 text-sm font-normal leading-none tracking-tight">
+              {isAuthenticated ? "Authenticated" : "Pending"}
             </div>
           </div>
         </div>
 
-        {/* Technical Details Section */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-4">Technical Details</h2>
-
-          <div className="grid grid-cols-1 gap-6">
-            {/* FedCM Request */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h3 className="card-title">FedCM Request</h3>
-                <div className="bg-base-200 p-4 rounded-lg">
-                  <pre className="overflow-x-auto text-sm">
-                    {fedCMRequest
-                      ? JSON.stringify(fedCMRequest, null, 2)
-                      : "No request made yet"}
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/* FedCM Response */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h3 className="card-title">FedCM Response</h3>
-                <div className="bg-base-200 p-4 rounded-lg">
-                  <pre className="overflow-x-auto text-sm">
-                    {serializableFedCMResponse
-                      ? JSON.stringify(serializableFedCMResponse, null, 2)
-                      : "No response received yet"}
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/* IdP Configurations */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h3 className="card-title">Loaded IdP Configurations</h3>
-                <div className="bg-base-200 p-4 rounded-lg">
-                  <pre className="overflow-x-auto text-sm">
-                    {idpConfigs.length > 0
-                      ? JSON.stringify(idpConfigs, null, 2)
-                      : "No configurations loaded"}
-                  </pre>
-                </div>
-              </div>
-            </div>
+        <div className="self-stretch inline-flex justify-start items-start gap-2">
+          <div className="justify-start text-fuchsia-500 text-base font-normal font-['JetBrains_Mono'] leading-relaxed">
+            {">"}_
+          </div>
+          <div className="flex-1 justify-start text-gray-900 text-base font-normal font-['JetBrains_Mono'] leading-relaxed">
+            {isAuthenticated
+              ? "Successfully authenticated"
+              : "Authentication in progress"}
           </div>
         </div>
+
+        {isAuthenticated && decodedTokenClaims && (
+          <CodeSnippet
+            title="User Details (Decoded Token)"
+            label="token.json"
+            defaultMessage="Decoding token or no token received..."
+            codeSnippet={decodedTokenClaims}
+          />
+        )}
+
+        <StatusTable
+          title="IdP Configurations"
+          headers={["Name", "Status"]}
+          values={idpValues}
+          statusColors={idpColors}
+        />
+
+        <StatusTable
+          title="Global Settings"
+          headers={["Setting", "Value"]}
+          values={[["Context", globalContext]]}
+          statusColors={["bg-cyan-400"]}
+        />
+      </div>
+
+      {/* Technical Details Section */}
+      <div className="self-stretch p-8 bg-white rounded-lg outline outline-offset-[-1px] outline-fuchsia-500 inline-flex flex-col justify-start items-center gap-11">
+        <div className="self-stretch justify-start text-gray-900 text-2xl font-normal font-['Space_Grotesk'] leading-7">
+          Technical Details
+        </div>
+
+        <CodeSnippet
+          title="FedCM Request"
+          label="request.json"
+          defaultMessage="No request made yet"
+          codeSnippet={fedCMRequest}
+        />
+        <CodeSnippet
+          title="FedCM Response"
+          label="response.json"
+          defaultMessage="No response received yet"
+          codeSnippet={serializableFedCMResponse}
+        />
+        <CodeSnippet
+          title="Loaded IdP Configurations"
+          label="config.json"
+          defaultMessage="No configurations loaded"
+          codeSnippet={idpConfigs}
+        />
       </div>
     </div>
   );
