@@ -2,7 +2,7 @@
  * Utilities for HTTPS detection and configuration
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 
 /**
  * Determines if the application is running in HTTPS mode
@@ -10,17 +10,17 @@ import { NextRequest } from 'next/server';
  */
 export const isHttpsEnabled = (): boolean => {
   // Check environment variable first (set in .env.local, .env.development, etc.)
-  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_USE_HTTPS) {
-    return process.env.NEXT_PUBLIC_USE_HTTPS === 'true';
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_USE_HTTPS) {
+    return process.env.NEXT_PUBLIC_USE_HTTPS === "true";
   }
 
   // Fallback to checking the protocol in the browser
-  if (typeof window !== 'undefined') {
-    return window.location.protocol === 'https:';
+  if (typeof window !== "undefined") {
+    return window.location.protocol === "https:";
   }
 
   // Default based on environment in server context without explicit setting
-  return process.env.NODE_ENV === 'production';
+  return process.env.NODE_ENV === "production";
 };
 
 /**
@@ -28,8 +28,8 @@ export const isHttpsEnabled = (): boolean => {
  */
 export const isRequestHttps = (request: NextRequest): boolean => {
   return (
-    request.headers.get('x-forwarded-proto') === 'https' ||
-    request.url.startsWith('https://')
+    request.headers.get("x-forwarded-proto") === "https" ||
+    request.url.startsWith("https://")
   );
 };
 
@@ -44,8 +44,8 @@ export const getCookieOptions = (request?: NextRequest) => {
   return {
     httpOnly: true,
     secure: isHttps,
-    sameSite: isHttps ? ('none' as const) : ('lax' as const),
+    sameSite: isHttps ? ("none" as const) : ("lax" as const),
     maxAge: 60 * 60 * 24, // 1 day default
-    path: '/',
+    path: "/",
   };
 };

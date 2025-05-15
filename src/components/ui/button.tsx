@@ -1,20 +1,20 @@
-'use client';
-import { ButtonHTMLAttributes, ReactNode, useState } from 'react';
-import cn from 'clsx';
-import Link from 'next/link';
+"use client";
+import { ButtonHTMLAttributes, ReactNode, useState } from "react";
+import cn from "clsx";
+import Link from "next/link";
 
 // Define variants for the button
 type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'accent'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'ghost'
-  | 'link';
-type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "info"
+  | "success"
+  | "warning"
+  | "error"
+  | "ghost"
+  | "link";
+type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 // Define the props for our component
 interface ButtonBaseProps {
@@ -27,31 +27,31 @@ interface ButtonBaseProps {
   disabled?: boolean;
   fullWidth?: boolean;
   icon?: ReactNode;
-  iconPosition?: 'left' | 'right';
+  iconPosition?: "left" | "right";
 }
 
 // Props for button type
 interface ButtonAsButton
   extends ButtonBaseProps,
     Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof ButtonBaseProps> {
-  as?: 'button';
+  as?: "button";
   href?: never;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 // Props for link type
 interface ButtonAsLink extends ButtonBaseProps {
-  as: 'link';
+  as: "link";
   href: string;
   onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 // Props for custom action
 interface ButtonAsCustom extends ButtonBaseProps {
-  as: 'custom';
+  as: "custom";
   href?: never;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  action: 'clear' | 'copy' | 'download' | string;
+  action: "clear" | "copy" | "download" | string;
 }
 
 // Define the props for our component
@@ -60,16 +60,16 @@ type ButtonProps = ButtonAsButton | ButtonAsLink | ButtonAsCustom;
 // Define the component
 export const MultiButton = ({
   children,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   isLoading = false,
-  loadingText = 'Loading...',
-  className = '',
+  loadingText = "Loading...",
+  className = "",
   disabled = false,
   fullWidth = false,
   icon,
-  iconPosition = 'left',
-  as = 'button',
+  iconPosition = "left",
+  as = "button",
   ...props
 }: ButtonProps) => {
   //local loading state
@@ -80,26 +80,26 @@ export const MultiButton = ({
 
   // base classes for styling
   const baseClasses = cn(
-    'btn',
+    "btn",
     `btn-${variant}`,
     `btn-${size}`,
-    loading && 'loading',
-    fullWidth && 'w-full',
-    className
+    loading && "loading",
+    fullWidth && "w-full",
+    className,
   );
 
   // Handle click for button with automatic loading state
   const handleButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (loading || disabled) return;
 
-    if (as === 'button' && props.onClick) {
+    if (as === "button" && props.onClick) {
       setInternalLoading(true);
       try {
         await (props as ButtonAsButton).onClick?.(e);
       } finally {
         setInternalLoading(false);
       }
-    } else if (as === 'custom' && (props as ButtonAsCustom).onClick) {
+    } else if (as === "custom" && (props as ButtonAsCustom).onClick) {
       setInternalLoading(true);
       try {
         await (props as ButtonAsCustom).onClick(e);
@@ -112,14 +112,14 @@ export const MultiButton = ({
   // Content with icon
   const buttonContent = (
     <>
-      {icon && iconPosition === 'left' && <span className='mr-2'>{icon}</span>}
+      {icon && iconPosition === "left" && <span className="mr-2">{icon}</span>}
       {loading ? loadingText : children}
-      {icon && iconPosition === 'right' && <span className='ml-2'>{icon}</span>}
+      {icon && iconPosition === "right" && <span className="ml-2">{icon}</span>}
     </>
   );
 
   // Render based on button type
-  if (as === 'link') {
+  if (as === "link") {
     const { href, onClick, ...linkProps } = props as ButtonAsLink;
     return (
       <Link
@@ -139,7 +139,7 @@ export const MultiButton = ({
       className={baseClasses}
       disabled={disabled || loading}
       onClick={handleButtonClick}
-      type={as === 'button' ? 'submit' : 'button'}
+      type={as === "button" ? "submit" : "button"}
       {...(props as ButtonAsButton)}
     >
       {buttonContent}

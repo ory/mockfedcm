@@ -1,10 +1,10 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      allowedOrigins: ['*'],
-      bodySizeLimit: '2mb',
+      allowedOrigins: ["*"],
+      bodySizeLimit: "2mb",
     },
   },
   typescript: {
@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  allowedDevOrigins: ['d599481a27fb.ngrok.app', 'localhost'],
+  allowedDevOrigins: ["d599481a27fb.ngrok.app", "localhost"],
 };
 
 export default nextConfig;

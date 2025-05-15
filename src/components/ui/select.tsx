@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { SelectHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { SelectHTMLAttributes } from "react";
+import clsx from "clsx";
 
 export interface SelectOption<T extends string | number | readonly string[]> {
   value: T;
@@ -9,7 +9,7 @@ export interface SelectOption<T extends string | number | readonly string[]> {
 }
 
 interface SelectInputProps<T extends string | number | readonly string[]>
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
+  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange"> {
   label?: string;
   options: SelectOption<T>[];
   error?: string;
@@ -26,19 +26,21 @@ function SelectInput<T extends string | number | readonly string[]>({
   ...props
 }: SelectInputProps<T>) {
   return (
-    <div className='form-control w-full'>
+    <div className="form-control w-full">
       {label && (
-        <label className='label'>
-          <span className='label-text font-medium'>{label}</span>
+        <label className="label">
+          <span className="label-text font-medium text-gray-900 text-sm font-['Schibsted_Grotesk'] leading-tight">
+            {label}
+          </span>
         </label>
       )}
       <select
         className={clsx(
-          'select select-bordered w-full',
+          "select select-bordered w-full",
           {
-            'select-error': error,
+            "select-error": error,
           },
-          className
+          className,
         )}
         value={value as string}
         onChange={(e) => onChange?.(e.target.value as T)}
@@ -51,8 +53,8 @@ function SelectInput<T extends string | number | readonly string[]>({
         ))}
       </select>
       {error && (
-        <label className='label'>
-          <span className='label-text-alt text-error'>{error}</span>
+        <label className="label">
+          <span className="label-text-alt text-error">{error}</span>
         </label>
       )}
     </div>

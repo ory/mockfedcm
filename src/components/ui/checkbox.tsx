@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { InputHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { InputHTMLAttributes } from "react";
+import clsx from "clsx";
 
 interface CheckboxInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
   error?: string;
   onChange?: (checked: boolean) => void;
@@ -19,26 +19,26 @@ const CheckboxInput = ({
   ...props
 }: CheckboxInputProps) => {
   return (
-    <div className='form-control'>
-      <label className='label cursor-pointer justify-start gap-2'>
+    <div className="form-control">
+      <label className="label cursor-pointer justify-start gap-2">
         <input
-          type='checkbox'
+          type="checkbox"
           className={clsx(
-            'checkbox',
+            "checkbox",
             {
-              'checkbox-error': error,
+              "checkbox-error": error,
             },
-            className
+            className,
           )}
           checked={checked}
           onChange={(e) => onChange?.(e.target.checked)}
           {...props}
         />
-        {label && <span className='label-text font-medium'>{label}</span>}
+        {label && <span className="label-text font-medium">{label}</span>}
       </label>
       {error && (
-        <label className='label'>
-          <span className='label-text-alt text-error'>{error}</span>
+        <label className="label">
+          <span className="label-text-alt text-error">{error}</span>
         </label>
       )}
     </div>

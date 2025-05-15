@@ -1,20 +1,20 @@
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 import {
   FedCMAccountsResponse,
   FedCMClientMetadataResponse,
   FedCMManifestResponse,
-} from '@/types/fedcm';
-import jwt from 'jsonwebtoken';
+} from "@/types/fedcm";
+import jwt from "jsonwebtoken";
 
-export const FEDCM_COOKIE_NAME = 'fedcm_session';
+export const FEDCM_COOKIE_NAME = "fedcm_session";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const IDP_DOMAIN = process.env.APP_FQDN || 'localhost:3000';
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+const IDP_DOMAIN = process.env.APP_FQDN || "localhost:3000";
 
 export function getManifestResponse(baseUrl?: string): FedCMManifestResponse {
   // Use provided baseUrl or fall back to existing logic
   if (!baseUrl) {
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
     baseUrl = `${protocol}://${IDP_DOMAIN}`;
   }
 
@@ -25,9 +25,9 @@ export function getManifestResponse(baseUrl?: string): FedCMManifestResponse {
     disconnect_endpoint: `/api/fedcm/disconnect`,
     login_url: `/idp`,
     branding: {
-      name: process.env.FEDCM_PROVIDER_NAME || 'FedCM Mock IdP',
-      background_color: process.env.FEDCM_BACKGROUND_COLOR || '#ffffff',
-      color: process.env.FEDCM_TEXT_COLOR || '#000000',
+      name: process.env.FEDCM_PROVIDER_NAME || "FedCM Mock IdP",
+      background_color: process.env.FEDCM_BACKGROUND_COLOR || "#ffffff",
+      color: process.env.FEDCM_TEXT_COLOR || "#000000",
       icons: [
         {
           url: `${baseUrl}/icon.png`,
@@ -54,14 +54,14 @@ export async function getUserFromCookie(): Promise<string | null> {
     };
     return payload.username;
   } catch (error) {
-    console.error('Error verifying session cookie:', error);
+    console.error("Error verifying session cookie:", error);
     return null;
   }
 }
 
 // Create a signed cookie with username
 export function createUserCookie(username: string): string {
-  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "24h" });
   return token;
 }
 
@@ -74,8 +74,8 @@ export async function getMockAccounts(): Promise<FedCMAccountsResponse> {
   }
 
   // Parse the username if it's in email format (extract the part before @)
-  const parsedUsername = username.includes('@')
-    ? username.split('@')[0]
+  const parsedUsername = username.includes("@")
+    ? username.split("@")[0]
     : username;
 
   // Create two mock accounts based on the username
@@ -86,7 +86,7 @@ export async function getMockAccounts(): Promise<FedCMAccountsResponse> {
         name: `${username} (Personal)`,
         email: `${parsedUsername}@example.com`,
         given_name: parsedUsername,
-        picture: 'https://picsum.photos/id/1005/200',
+        picture: "https://picsum.photos/id/1005/200",
         approved_clients: [],
       },
       {
@@ -94,7 +94,7 @@ export async function getMockAccounts(): Promise<FedCMAccountsResponse> {
         name: `${username} (Work)`,
         email: `${parsedUsername}@work-example.com`,
         given_name: parsedUsername,
-        picture: 'https://picsum.photos/id/1012/200',
+        picture: "https://picsum.photos/id/1012/200",
         approved_clients: [],
       },
     ],
@@ -103,7 +103,7 @@ export async function getMockAccounts(): Promise<FedCMAccountsResponse> {
 
 // Return client metadata (accept any client_id)
 export function getClientMetadata(
-  clientId: string
+  clientId: string,
 ): FedCMClientMetadataResponse {
   return {
     privacy_policy_url: `https://${clientId}/privacy`,

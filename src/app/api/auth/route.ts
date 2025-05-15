@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { FEDCM_COOKIE_NAME, createUserCookie } from '@/lib/fedcm';
-import { getCookieOptions } from '@/utils/https';
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { FEDCM_COOKIE_NAME, createUserCookie } from "@/lib/fedcm";
+import { getCookieOptions } from "@/utils/https";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,10 +9,10 @@ export async function POST(request: NextRequest) {
 
     // We don't validate the password - accept any credentials
     // Just check if username is provided
-    if (!username || typeof username !== 'string' || username.trim() === '') {
+    if (!username || typeof username !== "string" || username.trim() === "") {
       return NextResponse.json(
-        { error: 'Username is required' },
-        { status: 400 }
+        { error: "Username is required" },
+        { status: 400 },
       );
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const cookieOptions = getCookieOptions(request);
 
     console.log(
-      `Setting cookie with options: ${JSON.stringify(cookieOptions)}`
+      `Setting cookie with options: ${JSON.stringify(cookieOptions)}`,
     );
 
     // Set the session token as a cookie
@@ -35,16 +35,16 @@ export async function POST(request: NextRequest) {
       username,
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : 'Authentication failed',
+        error: error instanceof Error ? error.message : "Authentication failed",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function GET() {
-  return NextResponse.json({ key: 'Your Funny!' });
+  return NextResponse.json({ key: "Your Funny!" });
 }

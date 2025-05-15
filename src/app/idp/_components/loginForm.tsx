@@ -1,6 +1,5 @@
-import Button from '@/components/ui/button';
-import TextInput from '@/components/ui/textInput';
-import { useState } from 'react';
+import { useState } from "react";
+import Image from "next/image";
 
 interface LoginFormData {
   email: string;
@@ -9,12 +8,13 @@ interface LoginFormData {
 
 export default function LoginForm() {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const logoSrc = "/Vector.svg";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,10 +22,10 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth', {
-        method: 'POST',
+      const response = await fetch("/api/auth", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username: formData.email,
@@ -36,13 +36,13 @@ export default function LoginForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || "Login failed");
       }
 
       setSuccess(true);
 
       // TODO: figure out where to redirect after login...
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -51,51 +51,89 @@ export default function LoginForm() {
   };
 
   return (
-    <div className='w-full flex justify-center'>
-      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <h2 className='card-title'>Sign In</h2>
-
-          {error && (
-            <div className='alert alert-error'>
-              <span>{error}</span>
-            </div>
-          )}
-
-          {success && (
-            <div className='alert alert-success'>
-              <span>Successfully signed in! Redirecting...</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className='space-y-6'>
-            <TextInput
-              type='email'
-              label='Email'
-              value={formData.email}
-              placeholder='Email'
-              className='input input-bordered'
-              onChange={(value) => setFormData({ ...formData, email: value })}
-              required
+    <div className="lg:py-32 py-12 flex justify-center items-center w-full">
+      <div className="w-96 px-8 pt-8 pb-16 bg-white rounded-lg shadow-xl outline outline-offset-[-2px] outline-fuchsia-300 flex flex-col justify-start items-center gap-11">
+        <div className="flex flex-col justify-start items-center gap-3">
+          <div className="p-1.5 bg-gradient-to-br from-fuchsia-500/20 to-pink-200/20 rounded-md outline outline-offset-[-0.72px] outline-fuchsia-300 inline-flex justify-start items-center gap-1.5">
+            <Image
+              src={logoSrc}
+              alt={"Company Logo"}
+              width={40}
+              height={40}
+              className="object-contain"
             />
-            <TextInput
-              type='password'
-              label='Password'
-              value={formData.password}
-              placeholder='Password'
-              className='input input-bordered'
-              onChange={(value) =>
-                setFormData({ ...formData, password: value })
-              }
-              required
-            />
-            <div className='pt-4'>
-              <Button type='submit' disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </div>
-          </form>
+          </div>
+          <div className="justify-start text-gray-900 text-base font-medium leading-none">
+            Sign in to Mock-IdP
+          </div>
         </div>
+
+        {error && (
+          <div className="self-stretch p-3 bg-red-50 border border-red-300 rounded-md text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="self-stretch p-3 bg-green-50 border border-green-300 rounded-md text-green-700 text-sm">
+            Successfully signed in! Redirecting...
+          </div>
+        )}
+
+        <form
+          onSubmit={handleSubmit}
+          className="self-stretch flex flex-col justify-start items-start gap-8 w-full"
+        >
+          <div className="self-stretch flex flex-col justify-start items-start gap-6 w-full">
+            <div className="self-stretch flex flex-col justify-start items-start gap-1 w-full">
+              <div className="self-stretch inline-flex justify-start items-center gap-8">
+                <div className="flex-1 justify-start text-gray-900 text-sm font-medium leading-tight">
+                  Email
+                </div>
+              </div>
+              <div className="self-stretch p-3 bg-white rounded outline outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="flex-1 outline-none text-gray-900 text-sm"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="self-stretch flex flex-col justify-start items-start gap-1 w-full">
+              <div className="self-stretch inline-flex justify-start items-center gap-8">
+                <div className="flex-1 justify-start text-gray-900 text-sm font-medium leading-tight">
+                  Password
+                </div>
+              </div>
+              <div className="self-stretch p-3 bg-white rounded outline outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 overflow-hidden">
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="flex-1 outline-none text-gray-900 text-sm"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="self-stretch px-4 py-3.5 bg-gray-900 rounded inline-flex justify-center items-center overflow-hidden text-white text-sm font-normal leading-none"
+          >
+            {loading ? "Signing in..." : "Submit"}
+          </button>
+        </form>
       </div>
     </div>
   );
