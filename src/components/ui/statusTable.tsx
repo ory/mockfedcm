@@ -13,7 +13,7 @@ const StatusTable = ({
   headers = [],
   values = [],
   statusColors = [],
-  defaultBgColor = "bg-gray-100"
+  defaultBgColor = "bg-gray-100",
 }: StatusTableProps) => {
   return (
     <div className="self-stretch inline-flex flex-col justify-start items-start gap-4">
@@ -38,17 +38,25 @@ const StatusTable = ({
               ))}
             </div>
           )}
-          
+
           {values.length > 0 ? (
             values.map((rowValues, rowIndex) => (
-              <div key={rowIndex} className="self-stretch h-14 py-4 inline-flex justify-start items-center gap-4 w-full">
+              <div
+                key={rowIndex}
+                className="self-stretch h-14 py-4 inline-flex justify-start items-center gap-4 w-full"
+              >
                 {rowValues.map((value, columnIndex) => {
                   // For the second column (index 1), we apply special styling if it's a status
                   if (columnIndex === 1 && headers.length > 1) {
                     const bgColor = statusColors[rowIndex] || defaultBgColor;
                     return (
-                      <div key={columnIndex} className="flex-1 flex justify-start items-center">
-                        <div className={`px-3 py-1.5 ${bgColor} rounded flex justify-center items-center gap-2.5`}>
+                      <div
+                        key={columnIndex}
+                        className="flex-1 flex justify-start items-center"
+                      >
+                        <div
+                          className={`px-3 py-1.5 ${bgColor} rounded flex justify-center items-center gap-2.5`}
+                        >
                           <div className="justify-start text-cyan-950 text-sm font-normal leading-none tracking-tight">
                             {value}
                           </div>
@@ -56,10 +64,13 @@ const StatusTable = ({
                       </div>
                     );
                   }
-                  
+
                   // Regular cells
                   return (
-                    <div key={columnIndex} className="flex-1 flex justify-start items-center">
+                    <div
+                      key={columnIndex}
+                      className="flex-1 flex justify-start items-center"
+                    >
                       <div className="flex-1 justify-start text-black text-base font-normal font-['Schibsted_Grotesk'] leading-normal">
                         {value}
                       </div>

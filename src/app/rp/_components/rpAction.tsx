@@ -58,7 +58,7 @@ function RPActionContent() {
   const globalContext = searchParams.get("context") || "signin"; // Default to signin if not provided
 
   const [isFedCMSupported, setIsFedCMSupported] = useState<boolean | null>(
-    null
+    null,
   );
   const [idpConfigs, setIdpConfigs] = useState<FedCMIdpConfig[]>([]);
   const [idpProviderConfigs, setIdpProviderConfigs] = useState<
@@ -69,10 +69,10 @@ function RPActionContent() {
   const [fedCMRequest, setFedCMRequest] =
     useState<CredentialRequestOptions | null>(null);
   const [fedCMResponse, setFedCMResponse] = useState<CredentialType | null>(
-    null
+    null,
   );
   const [decodedTokenClaims, setDecodedTokenClaims] = useState<object | null>(
-    null
+    null,
   );
   const [serializableFedCMResponse, setSerializableFedCMResponse] = useState<
     object | null
@@ -163,19 +163,19 @@ function RPActionContent() {
       const configPromises = idpConfigs.map(async (idp) => {
         try {
           console.log(
-            `Fetching configuration for ${idp.name} from ${idp.configURL}`
+            `Fetching configuration for ${idp.name} from ${idp.configURL}`,
           );
           const response = await fetch(idp.configURL);
           if (!response.ok) {
             throw new Error(
-              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`
+              `Failed to fetch configuration for ${idp.name}: ${response.status} ${response.statusText}`,
             );
           }
           return { name: idp.name, config: await response.json() };
         } catch (err) {
           console.error(
             `Error fetching IdP configuration for ${idp.name}:`,
-            err
+            err,
           );
           return { name: idp.name, error: err };
         }
@@ -200,7 +200,7 @@ function RPActionContent() {
           setIdpProviderConfigs(configsMap);
           if (hasError) {
             console.warn(
-              "Some IdP provider configurations could not be loaded"
+              "Some IdP provider configurations could not be loaded",
             );
           }
         }
@@ -266,7 +266,7 @@ function RPActionContent() {
 
         if (providers.length === 0) {
           setError(
-            "No valid provider configurations available for authentication"
+            "No valid provider configurations available for authentication",
           );
           return;
         }
@@ -364,7 +364,7 @@ function RPActionContent() {
               .map(function (c) {
                 return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
               })
-              .join("")
+              .join(""),
           );
           setDecodedTokenClaims(JSON.parse(jsonPayload));
           console.log("Decoded JWT Claims:", JSON.parse(jsonPayload));
@@ -424,7 +424,7 @@ function RPActionContent() {
       idpProviderConfigs[idp.name] ? "Loaded" : "Failed",
     ]);
     idpColors.push(
-      idpProviderConfigs[idp.name] ? "bg-green-400" : "bg-red-400"
+      idpProviderConfigs[idp.name] ? "bg-green-400" : "bg-red-400",
     );
   });
 
