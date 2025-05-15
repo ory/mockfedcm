@@ -77,7 +77,7 @@ const GenericPageLayout = ({
 
         <div className="self-stretch flex-1 flex flex-col md:flex-row justify-start items-start w-full">
           <div
-            className="w-full md:flex-1 md:order-2 h-full px-4 md:px-8 flex flex-col justify-start items-center gap-8 border-y md:border-b-0 border-gray-300"
+            className="w-full md:w-1/2 md:order-2 h-full px-4 md:px-8 flex flex-col justify-start items-center gap-8 border-y md:border-b-0 border-gray-300"
             ref={formRef}
           >
             {FormContent && <FormContent {...formContentProps} />}
@@ -85,7 +85,7 @@ const GenericPageLayout = ({
 
           <div
             ref={explanationRef}
-            className="w-full md:flex-1 md:order-1 h-full py-8 md:py-32 bg-gray-50 flex flex-col justify-start items-center gap-4 border border-gray-300"
+            className="w-full md:w-1/2 md:order-1 h-full py-8 md:py-32 bg-gray-50 flex flex-col justify-start items-center gap-4 border border-gray-300"
             style={
               isLargeScreen && formHeight
                 ? { minHeight: `${formHeight}px` }
