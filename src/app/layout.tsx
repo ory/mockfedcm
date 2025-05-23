@@ -92,7 +92,7 @@ function RightSideContent() {
     <a
       data-state="Default"
       className="px-4 py-3 bg-gray-900 rounded shadow-[-3px_4px_13.899999618530273px_0px_rgba(217,70,239,0.50)] outline outline-offset-[-1px] outline-fuchsia-500 flex justify-center items-center overflow-hidden"
-      href="https://ory.sh"
+      href="https://www.ory.sh/docs/kratos/social-signin/fedcm"
     >
       <span className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none">
         Integrate FedCM
