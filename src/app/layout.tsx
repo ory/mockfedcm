@@ -30,9 +30,29 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  const logoSrc = "/Generic-Logo.svg";
+  return (
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${schibstedGrotesk.variable}`}
+    >
+      <body className="bg-white">
+        <Header
+          logo={<Logo />}
+          leftContent={<LeftSideContent />}
+          rightContent={<RightSideContent />}
+        />
+        <div className="pt-24 lg:pt-18 border-b border-fuchsia-500">
+          <main>
+            <div className="px-1">{children}</div>
+          </main>
+        </div>
+      </body>
+    </html>
+  );
+}
 
-  const leftSideContent = (
+function LeftSideContent() {
+  return (
     <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-2">
       <div className="pr-4 inline-flex justify-start items-center gap-4">
         <Link
@@ -65,21 +85,24 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </div>
     </div>
   );
+}
 
-  const rightSideContent = (
-    <div
+function RightSideContent() {
+  return (
+    <a
       data-state="Default"
       className="px-4 py-3 bg-gray-900 rounded shadow-[-3px_4px_13.899999618530273px_0px_rgba(217,70,239,0.50)] outline outline-offset-[-1px] outline-fuchsia-500 flex justify-center items-center overflow-hidden"
+      href="https://ory.sh"
     >
-      <div className="min-h-4 flex justify-center items-center gap-3">
-        <div className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none">
-          <a href="https://ory.sh">Integrate FedCM</a>
-        </div>
-      </div>
-    </div>
+      <span className="justify-start text-white text-base font-normal font-['Schibsted_Grotesk'] leading-none">
+        Integrate FedCM
+      </span>
+    </a>
   );
+}
 
-  const logo = (
+function Logo() {
+  return (
     <div
       data-haswordmark="true"
       data-variant="Default"
@@ -91,8 +114,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           className="flex items-center absolute w-10 h-10"
         >
           <Image
-            src={logoSrc}
-            alt={"Company Logo"}
+            src="/Generic-Logo.svg"
+            alt="Company Logo"
             width={40}
             height={40}
             className="object-contain"
@@ -103,25 +126,5 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Link href="/">MockFedCM</Link>
       </div>
     </div>
-  );
-
-  return (
-    <html
-      lang="en"
-      className={`${spaceGrotesk.variable} ${schibstedGrotesk.variable}`}
-    >
-      <body className="bg-white">
-        <Header
-          logo={logo}
-          leftContent={leftSideContent}
-          rightContent={rightSideContent}
-        />
-        <div className="pt-24 lg:pt-18 border-b border-fuchsia-500">
-          <main>
-            <div className="px-1">{children}</div>
-          </main>
-        </div>
-      </body>
-    </html>
   );
 }
