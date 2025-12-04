@@ -13,9 +13,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   allowedDevOrigins:
     process.env.NODE_ENV === "production"
       ? [process.env.NEXT_PUBLIC_APP_FQDN || ""]
